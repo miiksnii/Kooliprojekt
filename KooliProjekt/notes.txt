@@ -1,0 +1,23 @@
+
+
+
+Oleme projekte teostav ettevõte ning soovime luua tööde haldamise ja monitoorimise süsteemi.
+
+Soovime lisada projektid selliste andmetega: 
+projekti nimi, algus, tähtaeg, eelarve, tunnihind, projekti meeskond. 
+Iga projekti alla peab saama lisada ülesandeid, 
+mille kohta sisestatakse pea samad andmed, mis projekti kohta:
+pealkiri, algus, eeldatav ajakulu, vastutaja, ülesande kirjeldus ja kas on valmis või ei. 
+Iga ülesande kohta saab sisestada ajakulusid ehk töölogisid. 
+Töölogi andmed: 
+kuupäev, ajakulu, teostaja, tegevuse kirjeldus.
+
+Ülesanded ei pea olema hierarhilised kui see on keerukas.
+
+Vaikimisi arvutame projekti senist kulu töötundide ja tunnihinna põhjal. 
+On üks erand - ülesandele on määratud fikseeritud hind. 
+Projekti eelarve ja senine maksumus võiksid visuaalis hästi välja tulla. 
+Samuti oleks hea näha ülesannete juures eeldatava ja tegeliku ajakulu võrdlust. 
+Tööülesannete juurde peab saama lisada faile (dokumendid, joonised jmt).
+
+Süsteemi saavad kasutada ainult sisse loginud kasutajad.
