@@ -1,4 +1,5 @@
 using Kooliprojekt.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,5 +31,15 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+#if DEBUG
+using (var scope = app.Services.CreateScope())
+using (var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
+using (var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>())
+{
+    context.Database.EnsureCreated();
+    SeedData.Generate(context, userManager);
+}
+#endif
 
 app.Run();
