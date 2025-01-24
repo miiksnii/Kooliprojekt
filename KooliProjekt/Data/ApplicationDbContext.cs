@@ -5,13 +5,12 @@ namespace Kooliprojekt.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : base(options)
-        {
-        }
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    { }
 
-        public DbSet<ProjectItem> ProjectItem { get; set; }
-        public DbSet<ProjectList> ProjectList { get; set; }
-        public DbSet<WorkLog> WorkLog { get; set; } 
+    public DbSet<ProjectItem> ProjectItem { get; set; }
+    public DbSet<ProjectList> ProjectList { get; set; }
+    public DbSet<WorkLog> WorkLog { get; set; }
     }
 }

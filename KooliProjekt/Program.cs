@@ -1,6 +1,5 @@
 using Kooliprojekt.Data;
 using Microsoft.EntityFrameworkCore;
-// Adjust the namespace to where your ApplicationDbContext is located
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +26,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+// Define your controller route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
