@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Kooliprojekt.Data.ProjectItem>
+﻿@model Kooliprojekt.Data.PagedResult<Kooliprojekt.Data.ProjectItem>
+
 
 @{
     ViewData["Title"] = "Index";
@@ -13,34 +14,34 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                Title
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.StartDate)
+                StartDate
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EstimatedWorkTime)
+                EstimatedWorkTime
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AdminName)
+                AdminName
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                Description
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsDone)
+                IsDone
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ProjectList)
+                ProjectList
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Results) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)

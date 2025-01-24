@@ -19,9 +19,9 @@ namespace Kooliprojekt.Controllers
         }
 
         // GET: WorkLogs
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View(await _context.WorkLog.ToListAsync());
+            return View(await _context.WorkLog.GetPagedAsync(page, 5));
         }
 
         // GET: WorkLogs/Details/5

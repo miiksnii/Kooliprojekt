@@ -19,10 +19,10 @@ namespace Kooliprojekt.Controllers
         }
 
         // GET: ProjectItems
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             var applicationDbContext = _context.ProjectItem.Include(p => p.ProjectList);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await applicationDbContext.GetPagedAsync(page, 5));
         }
 
         // GET: ProjectItems/Details/5
