@@ -6,22 +6,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Kooliprojekt.Data;
+using Kooliprojekt.Services;
 
 namespace Kooliprojekt.Controllers
 {
     public class ProjectListsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IProjectListService _projectListService;
 
-        public ProjectListsController(ApplicationDbContext context)
+        public ProjectListsController(IProjectListService projectListService)
         {
-            _context = context;
+            _projectListService = projectListService;
         }
 
         // GET: ProjectLists
         public async Task<IActionResult> Index(int page = 1)
         {
-            return View(await _context.ProjectList.GetPagedAsync(page, 10));
+            return View(await _projectListService.List(page, 5));
         }
 
         // GET: ProjectLists/Details/5
@@ -32,8 +33,7 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var projectList = await _context.ProjectList
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var projectList = await _projectListService.Get(id);
             if (projectList == null)
             {
                 return NotFound();
@@ -56,9 +56,8 @@ namespace Kooliprojekt.Controllers
         public async Task<IActionResult> Create([Bind("Id,Title")] ProjectList projectList)
         {
             if (ModelState.IsValid)
-            {
-                _context.Add(projectList);
-                await _context.SaveChangesAsync();
+            { 
+                await _projectListService.Save(projectList);
                 return RedirectToAction(nameof(Index));
             }
             return View(projectList);
@@ -72,7 +71,7 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var projectList = await _context.ProjectList.FindAsync(id);
+            var projectList = await _projectListService.Get(id);
             if (projectList == null)
             {
                 return NotFound();
@@ -96,8 +95,8 @@ namespace Kooliprojekt.Controllers
             {
                 try
                 {
-                    _context.Update(projectList);
-                    await _context.SaveChangesAsync();
+                    //_projectListService.Update(projectList);
+                    await _projectListService.Save(projectList);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -123,8 +122,7 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var projectList = await _context.ProjectList
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var projectList = await _projectListService.Get(id);
             if (projectList == null)
             {
                 return NotFound();
@@ -138,19 +136,19 @@ namespace Kooliprojekt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var projectList = await _context.ProjectList.FindAsync(id);
+            var projectList = await _projectListService.Get(id);
             if (projectList != null)
             {
-                _context.ProjectList.Remove(projectList);
+                _projectListService.Delete(id);
             }
 
-            await _context.SaveChangesAsync();
+            await _projectListService.Save(projectList);
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProjectListExists(int id)
         {
-            return _context.ProjectList.Any(e => e.Id == id);
+            return _projectListService.Equals(id);
         }
     }
 }

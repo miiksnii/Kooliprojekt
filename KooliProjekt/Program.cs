@@ -1,4 +1,5 @@
 using Kooliprojekt.Data;
+using Kooliprojekt.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,14 @@ builder.Services.AddControllersWithViews();
 // Configure the DbContext with a database provider (e.g., SQL Server)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // Or UseSqlite, UseNpgsql, etc.
+
+// Add Identity services
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IProjectListService, ProjectListService>();
+
 
 var app = builder.Build();
 
@@ -38,7 +47,7 @@ using (var context = scope.ServiceProvider.GetRequiredService<ApplicationDbConte
 using (var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>())
 {
     context.Database.EnsureCreated();
-    SeedData.Generate(context, userManager);
+    SeedData.Generate(context, userManager); // This assumes you have a method to seed data.
 }
 #endif
 
