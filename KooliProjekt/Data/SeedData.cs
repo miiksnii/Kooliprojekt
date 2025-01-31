@@ -28,26 +28,23 @@ namespace Kooliprojekt.Data
                 EstimatedWorkTime = 123,         // Estimated work time (in hours, I assume)
                 IsDone = false,                  // Whether the item is completed or not
                 StartDate = DateTime.Now,        // Start date (set to the current date/time)
-                Description = "Project Description", // Optional description
                 ProjectListId = 1,               // Assuming the ProjectListId is 1 (or set to a valid ID)
-                ProjectList = new ProjectList   // Assuming you have a related ProjectList object
+                ProjectList = new ProjectList
                 {
-                    // Initialize any properties for ProjectList if necessary.
+                    Title = "Project List Title", // Set a Title for the ProjectList
+                                                  // Initialize any other properties for ProjectList if necessary.
                 },
                 WorkLogs = new List<WorkLog>     // Optional, initializing with some work logs
-                {
-                     new WorkLog
-                     {
-                        Date = DateTime.Now,            // Log date (current date/time)
-                        TimeSpentInMinutes = 120,       // Example time spent (2 hours)
-                        WorkerName = "Kaspar",          // Worker name
-                        Description = "Initial project setup" // Description of work done
-                     },
-            }
+    {
+         new WorkLog
+         {
+            Date = DateTime.Now,            // Log date (current date/time)
+            TimeSpentInMinutes = 120,       // Example time spent (2 hours)
+            WorkerName = "Kaspar",          // Worker name
+            Description = "Initial project setup" // Description of work done
+         },
+    }
             };
-
-
-
 
             context.ProjectItem.Add(list);
 

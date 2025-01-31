@@ -5,27 +5,27 @@ namespace Kooliprojekt.Services
 {
     public class ProjectListService : IProjectListService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _ProjectListService;
         public ProjectListService(ApplicationDbContext context)
         {
-            _context = context;
+            _ProjectListService = context;
         }
 
         public async Task Delete(int? id)
         {
-            await _context.ProjectItem
+            await _ProjectListService.ProjectItem
                 .Where(list => list.Id == id)
                 .ExecuteDeleteAsync();
         }
 
         public async Task<ProjectList> Get(int? id)
         {
-            return await _context.ProjectList.FindAsync(id);
+            return await _ProjectListService.ProjectList.FindAsync(id);
         }
 
         public async Task<PagedResult<ProjectList>> List(int page, int pageSize, ProjectListSearch search = null)
         {
-            var query = _context.ProjectList.AsQueryable();
+            var query = _ProjectListService.ProjectList.AsQueryable();
 
             if (search != null)
             {
@@ -66,14 +66,14 @@ namespace Kooliprojekt.Services
         {
             if (list.Id == 0)
             {
-                _context.ProjectList.Add(list);
+                _ProjectListService.ProjectList.Add(list);
             }
             else
             {
-                _context.ProjectList.Update(list);
+                _ProjectListService.ProjectList.Update(list);
             }
 
-            await _context.SaveChangesAsync();
+            await _ProjectListService.SaveChangesAsync();
         }
 
     }

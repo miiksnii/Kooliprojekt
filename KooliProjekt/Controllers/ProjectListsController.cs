@@ -33,7 +33,7 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var projectList = await _projectListService.Get(id);
+            var projectList = await _projectListService.Get(id.Value);  // Get by id
             if (projectList == null)
             {
                 return NotFound();
@@ -49,15 +49,13 @@ namespace Kooliprojekt.Controllers
         }
 
         // POST: ProjectLists/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title")] ProjectList projectList)
         {
             if (ModelState.IsValid)
-            { 
-                await _projectListService.Save(projectList);
+            {
+                await _projectListService.Save(projectList);  // Save using the service
                 return RedirectToAction(nameof(Index));
             }
             return View(projectList);
@@ -71,7 +69,7 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var projectList = await _projectListService.Get(id);
+            var projectList = await _projectListService.Get(id.Value);  // Get by id
             if (projectList == null)
             {
                 return NotFound();
@@ -80,8 +78,6 @@ namespace Kooliprojekt.Controllers
         }
 
         // POST: ProjectLists/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title")] ProjectList projectList)
@@ -95,8 +91,7 @@ namespace Kooliprojekt.Controllers
             {
                 try
                 {
-                    //_projectListService.Update(projectList);
-                    await _projectListService.Save(projectList);
+                    await _projectListService.Save(projectList);  // Save using the service
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -122,7 +117,7 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var projectList = await _projectListService.Get(id);
+            var projectList = await _projectListService.Get(id.Value);  // Get by id
             if (projectList == null)
             {
                 return NotFound();
@@ -136,19 +131,18 @@ namespace Kooliprojekt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var projectList = await _projectListService.Get(id);
+            var projectList = await _projectListService.Get(id);  // Get by id
             if (projectList != null)
             {
-                _projectListService.Delete(id);
+                await _projectListService.Delete(id);  // Use service to delete
             }
 
-            await _projectListService.Save(projectList);
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProjectListExists(int id)
         {
-            return _projectListService.Equals(id);
+            return _projectListService.Get(id) != null;  // Use service to check existence
         }
     }
 }
