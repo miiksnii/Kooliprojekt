@@ -1,8 +1,9 @@
-﻿namespace Kooliprojekt.Data
+﻿using KooliProjekt.Data;
+
+namespace Kooliprojekt.Data
 {
-    public class ProjectList
+    public class ProjectList : Entity
     {
-        public int Id { get; set; }
         public string Title { get; set; }
 
         public IList<ProjectItem> Items { get; set; }
