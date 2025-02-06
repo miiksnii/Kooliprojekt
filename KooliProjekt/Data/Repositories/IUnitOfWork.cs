@@ -1,5 +1,6 @@
 ﻿using Kooliprojekt.Data;
-
+using KooliProjekt.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Data.Repositories
 {
@@ -8,7 +9,6 @@ namespace KooliProjekt.Data.Repositories
         Task BeginTransaction();
         Task Commit();
         Task Rollback();
-
-        //ITodoListRepository TodoListRepository { get; }
+        IProjectListRepository ProjectListRepository { get; }
     }
 }

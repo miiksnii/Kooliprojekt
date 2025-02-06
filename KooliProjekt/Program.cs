@@ -1,5 +1,7 @@
 using Kooliprojekt.Data;
 using Kooliprojekt.Services;
+using KooliProjekt.Data.Repositories;
+using KooliProjekt.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +20,10 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IProjectListService, ProjectListService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+//repos
+builder.Services.AddScoped<IProjectListRepository, ProjectListRepository>();
 
 
 var app = builder.Build();

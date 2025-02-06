@@ -5,8 +5,15 @@ namespace Kooliprojekt.Services
     public interface IProjectListService
     {
         Task<PagedResult<ProjectList>> List(int page, int pageSize, ProjectListSearch search = null);
-        Task<ProjectList> Get(int? id);
+        Task<ProjectList> Get(int id);
         Task Save(ProjectList list);
-        Task Delete(int? id);
+        Task Delete(int id);
     }
 }
+
+
+
+
+
+
+

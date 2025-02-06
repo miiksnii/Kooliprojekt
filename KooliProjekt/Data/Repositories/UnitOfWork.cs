@@ -1,23 +1,25 @@
 ﻿using Kooliprojekt.Data;
+
 namespace KooliProjekt.Data.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
 
+        // Repository-d on nüüd õigesti lisatud
         public UnitOfWork(ApplicationDbContext context,
-            ProjectListRepository todoItemRepository,
-            ProjectListRepository todoListRepository)
+                          IProjectListRepository projectListRepository)
         {
             _context = context;
 
-            TodoItemRepository = todoItemRepository;
-            TodoListRepository = todoListRepository;
+            // Initsialiseerime repository-de omadused
+            ProjectListRepository = projectListRepository;
         }
 
-        public ProjectListRepository TodoItemRepository { get; private set; }
-        public ProjectListRepository TodoListRepository { get; private set; }
+        // Repository omadused
+        public IProjectListRepository ProjectListRepository { get; private set; }
 
+        // Transaktsioonide algatamine, commiteerimine ja rollback
         public async Task BeginTransaction()
         {
             await _context.Database.BeginTransactionAsync();
