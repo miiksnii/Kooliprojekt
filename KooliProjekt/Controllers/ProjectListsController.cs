@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Kooliprojekt.Data;
 using Kooliprojekt.Services;
+using Kooliprojekt.Models;
+using KooliProjekt.Services;
 
 namespace Kooliprojekt.Controllers
 {
@@ -20,9 +22,11 @@ namespace Kooliprojekt.Controllers
         }
 
         // GET: ProjectLists
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, ProjectListIndexModel model = null)
         {
-            return View(await _projectListService.List(page, 5));
+            model = model ?? new ProjectListIndexModel();
+            model.Data = await _projectListService.List(page, 5, model.Search);
+            return View(model);
         }
 
         // GET: ProjectLists/Details/5

@@ -1,6 +1,8 @@
 ﻿using KooliProjekt.Data.Repositories;
 using Kooliprojekt.Data;
 using Microsoft.EntityFrameworkCore;
+using Kooliprojekt.Search;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 public class ProjectListRepository : BaseRepository<ProjectList>, IProjectListRepository
 {
@@ -16,9 +18,34 @@ public class ProjectListRepository : BaseRepository<ProjectList>, IProjectListRe
             .FirstOrDefaultAsync();
     }
 
-    public override async Task<PagedResult<ProjectList>> List(int page, int pageSize)
+    public async Task<PagedResult<ProjectList>> List(int page, int pageSize, ProjectListSearch search = null)
     {
-        return await DbContext.ProjectList
+        /*return await DbContext.ProjectList
+            .OrderBy(list => list.Title)
+            .GetPagedAsync(page, pageSize);*/
+        var query = DbContext.ProjectList.AsQueryable();
+        search = search ?? new ProjectListSearch();
+
+        if (!string.IsNullOrWhiteSpace(search.Keyword))
+        {
+            query = query.Where(list => list.Title.Contains(search.Keyword));
+        }
+
+        if (search.IsDone != null)
+        {
+            query = query.Where(list => list.Items.Any());
+
+            if (search.IsDone.Value)
+            {
+                query = query.Where(list => list.Items.All(item => item.IsDone));
+            }
+            else
+            {
+                query = query.Where(list => list.Items.Any(item => !item.IsDone));
+            }
+        }
+
+        return await query
             .OrderBy(list => list.Title)
             .GetPagedAsync(page, pageSize);
     }

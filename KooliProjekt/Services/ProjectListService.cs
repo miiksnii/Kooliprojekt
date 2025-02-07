@@ -27,7 +27,7 @@ namespace KooliProjekt.Services
 
         public async Task<PagedResult<ProjectList>> List(int page, int pageSize, ProjectListSearch search = null)
         {
-            return await _IUnitOfWork.ProjectListRepository.List(page, pageSize);
+            return await _IUnitOfWork.ProjectListRepository.List(page, pageSize, search);
         }
 
         public async Task Save(ProjectList list)
