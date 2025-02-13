@@ -144,7 +144,7 @@ namespace Kooliprojekt.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProjectListExists(int id)
+        public bool ProjectListExists(int id)
         {
             return _projectListService.Get(id) != null;  // Use service to check existence
         }
