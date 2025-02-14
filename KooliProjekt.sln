@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kooliprojekt", "Kooliprojekt\Kooliprojekt.csproj", "{6A606CCC-E6EA-4271-BB10-5E01EE30481F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kooliprojekt", "Kooliprojekt\Kooliprojekt.csproj", "{6A606CCC-E6EA-4271-BB10-5E01EE30481F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KooliProjekt.UnitTests", "KooliProjekt.UnitTests\KooliProjekt.UnitTests.csproj", "{FB9F71E0-2B23-4A88-A74A-D97E2BF17395}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{6A606CCC-E6EA-4271-BB10-5E01EE30481F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A606CCC-E6EA-4271-BB10-5E01EE30481F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A606CCC-E6EA-4271-BB10-5E01EE30481F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB9F71E0-2B23-4A88-A74A-D97E2BF17395}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB9F71E0-2B23-4A88-A74A-D97E2BF17395}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB9F71E0-2B23-4A88-A74A-D97E2BF17395}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB9F71E0-2B23-4A88-A74A-D97E2BF17395}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
