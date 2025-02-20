@@ -14,4 +14,4 @@ Get-ChildItem -Path ./BuildReports/UnitTests -Directory -Recurse | Remove-Item -
 
 reportgenerator "-reports:$TestReports" "-targetdir:.//BuildReports//Coverage" "-reporttype:Html" "-classfilters:-AspNetCoreGeneratedDocument.*"
 
-start "BuildReports\Coverage\index.htm"
+start "BuildReports\Coverage\index.html"

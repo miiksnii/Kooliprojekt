@@ -221,32 +221,27 @@ var assemblies = [
   {
     "name": "KooliProjekt",
     "classes": [
-      { "name": "Kooliprojekt.Controllers.HomeController", "rp": "KooliProjekt_HomeController.html", "cl": 12, "ucl": 0, "cal": 12, "tl": 31, "cb": 3, "tb": 4, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Kooliprojekt.Controllers.HomeController", "rp": "KooliProjekt_HomeController.html", "cl": 6, "ucl": 6, "cal": 12, "tl": 31, "cb": 0, "tb": 4, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Controllers.ProjectItemsController", "rp": "KooliProjekt_ProjectItemsController.html", "cl": 0, "ucl": 90, "cal": 90, "tl": 164, "cb": 0, "tb": 22, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Kooliprojekt.Controllers.ProjectListsController", "rp": "KooliProjekt_ProjectListsController.html", "cl": 65, "ucl": 14, "cal": 79, "tl": 152, "cb": 18, "tb": 24, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Kooliprojekt.Controllers.ProjectListsController", "rp": "KooliProjekt_ProjectListsController.html", "cl": 58, "ucl": 0, "cal": 58, "tl": 122, "cb": 16, "tb": 16, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Controllers.WorkLogsController", "rp": "KooliProjekt_WorkLogsController.html", "cl": 0, "ucl": 82, "cal": 82, "tl": 156, "cb": 0, "tb": 22, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Data.ApplicationDbContext", "rp": "KooliProjekt_ApplicationDbContext.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 16, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "KooliProjekt.Data.Entity", "rp": "KooliProjekt_Entity.html", "cl": 1, "ucl": 0, "cal": 1, "tl": 7, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Kooliprojekt.Data.PagedResult<T>", "rp": "KooliProjekt_PagedResult_1.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 12, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Kooliprojekt.Data.PagedResult<T>", "rp": "KooliProjekt_PagedResult_1.html", "cl": 5, "ucl": 0, "cal": 5, "tl": 12, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Data.PagedResultBase", "rp": "KooliProjekt_PagedResultBase.html", "cl": 0, "ucl": 4, "cal": 4, "tl": 10, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Data.PagingExtensions", "rp": "KooliProjekt_PagingExtensions.html", "cl": 0, "ucl": 18, "cal": 18, "tl": 32, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Data.ProjectItem", "rp": "KooliProjekt_ProjectItem.html", "cl": 0, "ucl": 11, "cal": 11, "tl": 25, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Kooliprojekt.Data.ProjectList", "rp": "KooliProjekt_ProjectList.html", "cl": 6, "ucl": 0, "cal": 6, "tl": 17, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "KooliProjekt.Data.Repositories.BaseRepository<T>", "rp": "KooliProjekt_BaseRepository_1.html", "cl": 0, "ucl": 28, "cal": 28, "tl": 48, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "KooliProjekt.Data.Repositories.UnitOfWork", "rp": "KooliProjekt_UnitOfWork.html", "cl": 0, "ucl": 16, "cal": 16, "tl": 38, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Kooliprojekt.Data.ProjectList", "rp": "KooliProjekt_ProjectList.html", "cl": 7, "ucl": 0, "cal": 7, "tl": 16, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Data.SeedData", "rp": "KooliProjekt_SeedData.html", "cl": 0, "ucl": 39, "cal": 39, "tl": 56, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Data.WorkLog", "rp": "KooliProjekt_WorkLog.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 11, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Migrations.ApplicationDbContextModelSnapshot", "rp": "KooliProjekt_ApplicationDbContextModelSnapshot.html", "cl": 0, "ucl": 355, "cal": 355, "tl": 395, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Migrations.new1", "rp": "KooliProjekt_new1.html", "cl": 0, "ucl": 359, "cal": 359, "tl": 420, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Migrations.start", "rp": "KooliProjekt_start.html", "cl": 0, "ucl": 615, "cal": 615, "tl": 702, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Kooliprojekt.Models.ErrorViewModel", "rp": "KooliProjekt_ErrorViewModel.html", "cl": 1, "ucl": 1, "cal": 2, "tl": 9, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Kooliprojekt.Models.ErrorViewModel", "rp": "KooliProjekt_ErrorViewModel.html", "cl": 0, "ucl": 2, "cal": 2, "tl": 9, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "KooliProjekt.Models.ProjectItem", "rp": "KooliProjekt_ProjectItem.2.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 11, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Kooliprojekt.Models.ProjectListIndexModel", "rp": "KooliProjekt_ProjectListIndexModel.html", "cl": 0, "ucl": 2, "cal": 2, "tl": 12, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Search.ProjectListSearch", "rp": "KooliProjekt_ProjectListSearch.html", "cl": 0, "ucl": 2, "cal": 2, "tl": 8, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "KooliProjekt.Services.ProjectListService", "rp": "KooliProjekt_ProjectListService.html", "cl": 0, "ucl": 16, "cal": 16, "tl": 38, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Kooliprojekt.Services.ProjectListService", "rp": "KooliProjekt_ProjectListService.html", "cl": 0, "ucl": 58, "cal": 58, "tl": 87, "cb": 0, "tb": 10, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Kooliprojekt.Views.Shared.Components.PagerViewComponent", "rp": "KooliProjekt_PagerViewComponent.html", "cl": 0, "ucl": 3, "cal": 3, "tl": 13, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Program", "rp": "KooliProjekt_Program.html", "cl": 0, "ucl": 31, "cal": 31, "tl": 60, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "ProjectListRepository", "rp": "KooliProjekt_ProjectListRepository.html", "cl": 0, "ucl": 31, "cal": 31, "tl": 52, "cb": 0, "tb": 8, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Program", "rp": "KooliProjekt_Program.html", "cl": 0, "ucl": 29, "cal": 29, "tl": 54, "cb": 0, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
     ]},
 ];
 
@@ -261,7 +256,7 @@ var riskHotspotMetrics = [
 
 var riskHotspots = [
   {
-    "assembly": "KooliProjekt", "class": "ProjectListRepository", "reportPath": "KooliProjekt_ProjectListRepository.html", "methodName": "List()", "methodShortName": "List()", "fileIndex": 0, "line": 22,
+    "assembly": "KooliProjekt", "class": "Kooliprojekt.Services.ProjectListService", "reportPath": "KooliProjekt_ProjectListService.html", "methodName": "List()", "methodShortName": "List()", "fileIndex": 0, "line": 34,
     "metrics": [
       { "value": 72, "exceeded": true },
       { "value": 8, "exceeded": false },

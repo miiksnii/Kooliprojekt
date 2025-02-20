@@ -1,4 +1,4 @@
-﻿using KooliProjekt.Controllers;
+﻿using Kooliprojekt.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 

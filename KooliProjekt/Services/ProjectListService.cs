@@ -6,9 +6,16 @@ namespace Kooliprojekt.Services
     public class ProjectListService : IProjectListService
     {
         private readonly ApplicationDbContext _ProjectListService;
+        private IProjectListService @object;
+
         public ProjectListService(ApplicationDbContext context)
         {
             _ProjectListService = context;
+        }
+
+        public ProjectListService(IProjectListService @object)
+        {
+            this.@object = @object;
         }
 
         public async Task Delete(int? id)
