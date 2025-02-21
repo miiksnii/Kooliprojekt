@@ -8,31 +8,41 @@ namespace KooliProjekt.Services
 {
     public class ProjectListService : IProjectListService
     {
-        private readonly IUnitOfWork _IUnitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IProjectListRepository _projectListRepository;
 
-        public ProjectListService(IUnitOfWork IUnitOfWork)
+
+        public ProjectListService(IUnitOfWork unitOfWork, IProjectListRepository projectListRepository)
         {
-            _IUnitOfWork = IUnitOfWork;
+            _unitOfWork = unitOfWork;
+            _projectListRepository = projectListRepository;
         }
 
         public async Task Delete(int id)
         {
-            await _IUnitOfWork.ProjectListRepository.Delete(id);
+            await _projectListRepository.Delete(id); // Use the repository directly
         }
 
         public async Task<ProjectList> Get(int id)
         {
-            return await _IUnitOfWork.ProjectListRepository.Get(id);
+            return await _projectListRepository.Get(id); // Use the repository directly
         }
 
         public async Task<PagedResult<ProjectList>> List(int page, int pageSize, ProjectListSearch search = null)
         {
-            return await _IUnitOfWork.ProjectListRepository.List(page, pageSize, search);
+            return await _projectListRepository.List(page, pageSize); // Use the repository directly
         }
 
         public async Task Save(ProjectList list)
         {
-            _IUnitOfWork.ProjectListRepository.Save(list);
+            await _projectListRepository.Save(list); // Use the repository directly
+        }
+
+        public bool ProjectListExists(int id)
+        {
+            // Use the Get method to check if the ProjectList exists
+            var projectList = _projectListRepository.Get(id).Result; // Synchronously wait for the result
+            return projectList != null;
         }
     }
 }

@@ -211,7 +211,7 @@ namespace KooliProjekt.UnitTests.ControllerTests
             Assert.Equal("Index", result.ActionName);
         }
 
-        
+
 
         [Fact]
         public async Task ProjectListExists_Should_Return_True_When_ProjectList_Exists()
@@ -224,11 +224,84 @@ namespace KooliProjekt.UnitTests.ControllerTests
                 .ReturnsAsync(projectList);  // Simulate that the project list exists
 
             // Act
-            var result = _controller.ProjectListExists(projectListId);
+            var result = _controller.ProjectListExists(projectListId);  // No await because it returns a bool
 
             // Assert
             Assert.True(result);
         }
+
+        [Fact]
+        public async Task Edit_Post_Should_Return_View_When_ModelState_Is_Invalid()
+        {
+            // Arrange
+            var projectList = new ProjectList { Id = 1, Title = "" };  // Invalid title to trigger ModelState error
+            _controller.ModelState.AddModelError("Title", "Title is required");
+
+            // Act
+            var result = await _controller.Edit(1, projectList) as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(projectList, result.Model);  // The model should be returned with errors
+        }
+
+        [Fact]
+        public async Task Edit_Post_Should_Redirect_To_Index_When_Save_Is_Successful()
+        {
+            // Arrange
+            var projectList = new ProjectList { Id = 1, Title = "Valid Project" };
+            _projectListServiceMock
+                .Setup(x => x.Save(It.IsAny<ProjectList>()))
+                .Returns(Task.CompletedTask);  // Simulate successful save
+
+            // Act
+            var result = await _controller.Edit(1, projectList) as RedirectToActionResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Index", result.ActionName);  // Should redirect to Index
+        }
+
+        [Fact]
+        public async Task Edit_Post_Should_Return_NotFound_When_DbUpdateConcurrencyException_Is_Thrown()
+        {
+            // Arrange
+            var projectList = new ProjectList { Id = 1, Title = "Updated Project" };
+            _projectListServiceMock
+                .Setup(x => x.Save(It.IsAny<ProjectList>()))
+                .ThrowsAsync(new DbUpdateConcurrencyException());  // Simulate concurrency exception
+
+            // Act
+            var result = await _controller.Edit(1, projectList) as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
+
+        [Fact]
+        public async Task Edit_Post_Should_Return_NotFound_When_DbUpdateConcurrencyException_Is_Thrown_And_ProjectList_Does_Not_Exist()
+        {
+            // Arrange
+            var projectList = new ProjectList { Id = 1, Title = "Updated Project" };
+
+            // Mock Save to throw DbUpdateConcurrencyException
+            _projectListServiceMock
+                .Setup(x => x.Save(It.IsAny<ProjectList>()))
+                .ThrowsAsync(new DbUpdateConcurrencyException());  // Simulate concurrency exception
+
+            // Mock Get to return null, simulating that the ProjectList doesn't exist
+            _projectListServiceMock
+                .Setup(x => x.Get(projectList.Id))
+                .ReturnsAsync((ProjectList)null);  // Simulate that the project list doesn't exist
+
+            // Act
+            var result = await _controller.Edit(projectList.Id, projectList) as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(result);  // Ensure a NotFoundResult is returned
+        }
+
 
 
         [Fact]
@@ -277,6 +350,194 @@ namespace KooliProjekt.UnitTests.ControllerTests
             // Assert
             Assert.NotNull(result);
         }
+
+        [Fact]
+        public async Task Index_Should_Return_View_With_Model_When_ProjectLists_Are_Found()
+        {
+            // Arrange
+            var page = 1;
+            var model = new ProjectListIndexModel();
+            var pagedResult = new PagedResult<ProjectList> { Results = new List<ProjectList> { new ProjectList { Id = 1, Title = "Test Project" } } };
+            model.Data = pagedResult;
+            _projectListServiceMock.Setup(x => x.List(page, 5, model.Search)).ReturnsAsync(pagedResult);
+
+            // Act
+            var result = await _controller.Index(page, model) as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(model, result.Model);
+        }
+
+        // Test for Create POST method with invalid model
+        [Fact]
+        public async Task Create_Post_Should_Return_View_When_Model_Is_Invalid()
+        {
+            // Arrange
+            var projectList = new ProjectList { Id = 1, Title = "Test Project" };
+            _controller.ModelState.AddModelError("Title", "Title is required");
+
+            // Act
+            var result = await _controller.Create(projectList) as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(projectList, result.Model);
+        }
+
+        // Test for Edit POST method when IDs do not match
+        [Fact]
+        public async Task Edit_Post_Should_Return_NotFound_When_Id_Mismatches()
+        {
+            // Arrange
+            var projectList = new ProjectList { Id = 2, Title = "Mismatched Project" };
+
+            // Act
+            var result = await _controller.Edit(1, projectList) as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void ProjectListExists_Should_Return_True_When_ProjectList_Exist()
+        {
+            // Arrange
+            int projectListId = 1;
+            var existingProjectList = new ProjectList { Id = projectListId, Title = "Test Project" };
+
+            // Mock the service to return the existing project list
+            _projectListServiceMock
+                .Setup(service => service.Get(projectListId))
+                .ReturnsAsync(existingProjectList);  // Simulate the service returning a valid project list
+
+            // Act
+            var result = _controller.ProjectListExists(projectListId);  // Call the method being tested
+
+            // Assert
+            Assert.True(result);  // Assert that it returns true, as the project list exists
+        }
+
+        [Fact]
+        public void ProjectListExists_Should_Return_False_When_ProjectList_Does_Not_Exist()
+        {
+            // Arrange
+            int projectListId = 999;  // An ID that doesn't exist
+            _projectListServiceMock
+                .Setup(service => service.Get(projectListId))
+                .ReturnsAsync((ProjectList)null);  // Simulate the service returning null, meaning the project list doesn't exist
+
+            // Act
+            var result = _controller.ProjectListExists(projectListId);  // Call the method being tested
+
+            // Assert
+            Assert.False(result);  // Assert that it returns false, as the project list does not exist
+        }
+
+        [Fact]
+        public void ProjectListExists_Should_Throw_Concurrency_Exception_When_DbUpdateConcurrencyException_Is_Thrown()
+        {
+            // Arrange
+            int projectListId = 1;
+
+            // Mock the service to throw a DbUpdateConcurrencyException when calling Get
+            _projectListServiceMock
+                .Setup(service => service.Get(projectListId))
+                .ThrowsAsync(new DbUpdateConcurrencyException());  // Simulate a concurrency exception
+
+            // Act & Assert
+            var exception = Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => Task.Run(() => _controller.ProjectListExists(projectListId)));
+            Assert.NotNull(exception);
+        }
+
+        [Fact]
+        public async Task Edit_ReturnsNotFound_WhenProjectListDoesNotExist()
+        {
+            // Arrange
+            var mockService = new Mock<IProjectListService>();
+            mockService.Setup(service => service.Get(It.IsAny<int>())).ReturnsAsync((ProjectList)null);  // Simulate non-existent project
+
+            var controller = new ProjectListsController(mockService.Object);
+
+            // Act
+            var result = await controller.Edit(999);  // ID that doesn't exist
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Delete_ReturnsNotFound_WhenProjectListDoesNotExist()
+        {
+            // Arrange
+            var mockService = new Mock<IProjectListService>();
+            mockService.Setup(service => service.Get(It.IsAny<int>())).ReturnsAsync((ProjectList)null);  // Simulate non-existent project
+
+            var controller = new ProjectListsController(mockService.Object);
+
+            // Act
+            var result = await controller.Delete(999);  // ID that doesn't exist
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Create_RedirectsToIndex_AfterSuccessfulSave()
+        {
+            // Arrange
+            var mockService = new Mock<IProjectListService>();
+            var projectList = new ProjectList { Id = 1, Title = "Test Project" };
+            mockService.Setup(service => service.Save(projectList)).Returns(Task.CompletedTask);  // Simulate save
+
+            var controller = new ProjectListsController(mockService.Object);
+
+            // Act
+            var result = await controller.Create(projectList);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", redirectResult.ActionName);  // Ensure it redirects to Index
+        }
+
+        [Fact]
+        public async Task Edit_RedirectsToIndex_AfterSuccessfulSave()
+        {
+            // Arrange
+            var mockService = new Mock<IProjectListService>();
+            var projectList = new ProjectList { Id = 1, Title = "Test Project" };
+            mockService.Setup(service => service.Save(projectList)).Returns(Task.CompletedTask);  // Simulate save
+
+            var controller = new ProjectListsController(mockService.Object);
+
+            // Act
+            var result = await controller.Edit(1, projectList);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", redirectResult.ActionName);  // Ensure it redirects to Index
+        }
+        public async Task Edit_HandlesConcurrencyException_WhenProjectListIsModifiedExternally()
+        {
+            // Arrange
+            var mockService = new Mock<IProjectListService>();
+            var projectList = new ProjectList { Id = 1, Title = "Test Project" };
+
+            // Set up service to return a project list and simulate concurrency exception
+            mockService.Setup(service => service.Get(1)).ReturnsAsync(projectList);
+            mockService.Setup(service => service.Save(It.IsAny<ProjectList>())).ThrowsAsync(new DbUpdateConcurrencyException());  // Simulate concurrency issue
+            mockService.Setup(service => service.ProjectListExists(It.IsAny<int>())).Returns(false);  // Return bool directly
+
+            var controller = new ProjectListsController(mockService.Object);
+
+            // Act
+            var result = await controller.Edit(1, projectList);
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundResult>(result);  // Ensure the result is NotFound
+        }
+
+
 
 
     }

@@ -146,7 +146,11 @@ namespace Kooliprojekt.Controllers
 
         public bool ProjectListExists(int id)
         {
-            return _projectListService.Get(id) != null;  // Use service to check existence
+            // Synchronously wait for the result of Get
+            var projectList = _projectListService.Get(id).Result;  // .Result will block until the task completes
+            return projectList != null;
         }
+
+
     }
 }
