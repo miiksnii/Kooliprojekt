@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using Microsoft.EntityFrameworkCore;
+using KooliProjekt.Services;
 
 namespace KooliProjekt.UnitTests.ControllerTests
 {
@@ -50,7 +51,7 @@ namespace KooliProjekt.UnitTests.ControllerTests
             // Assert
             Assert.NotNull(result);
         }
-
+        
         [Fact]
         public async Task Details_Should_Return_View_With_Model_When_ProjectList_Was_Found()
         {
@@ -537,8 +538,21 @@ namespace KooliProjekt.UnitTests.ControllerTests
             var notFoundResult = Assert.IsType<NotFoundResult>(result);  // Ensure the result is NotFound
         }
 
+        [Fact]
+        public async Task Edit_Should_Throw_Exception_On_Concurrency_Error()
+        {
+            // Arrange
+            var projectList = new ProjectList { Id = 1, Title = "Test Project" };
+            _projectListServiceMock
+                .Setup(x => x.Save(It.IsAny<ProjectList>()))
+                .ThrowsAsync(new DbUpdateConcurrencyException());
 
+            _projectListServiceMock
+                .Setup(x => x.Get(projectList.Id))
+                .ReturnsAsync(projectList);
 
-
+            // Act & Assert
+            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => _controller.Edit(projectList.Id, projectList));
+        }
     }
 }
