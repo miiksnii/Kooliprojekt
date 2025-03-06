@@ -7,8 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Kooliprojekt.Data;
 using Kooliprojekt.Services;
+<<<<<<< HEAD
 using Kooliprojekt.Models;
 using KooliProjekt.Services;
+=======
+using NuGet.ContentModel;
+>>>>>>> 70b27eba397d84857bbd0cb5e4abd84079f159fe
 
 namespace Kooliprojekt.Controllers
 {
@@ -84,34 +88,7 @@ namespace Kooliprojekt.Controllers
         // POST: ProjectLists/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title")] ProjectList projectList)
-        {
-            if (id != projectList.Id)
-            {
-                return NotFound();
-            }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await _projectListService.Save(projectList);  // Save using the service
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProjectListExists(projectList.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(projectList);
-        }
 
         // GET: ProjectLists/Delete/5
         public async Task<IActionResult> Delete(int? id)

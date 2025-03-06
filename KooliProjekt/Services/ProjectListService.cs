@@ -8,15 +8,31 @@ namespace KooliProjekt.Services
 {
     public class ProjectListService : IProjectListService
     {
+<<<<<<< HEAD
         private readonly IProjectListRepository _projectListRepository;
 
 
         public ProjectListService(IUnitOfWork unitOfWork, IProjectListRepository projectListRepository)
+=======
+        private readonly ApplicationDbContext _ProjectListService;
+        private IProjectListService @object;
+
+        public ProjectListService(ApplicationDbContext context)
+>>>>>>> 70b27eba397d84857bbd0cb5e4abd84079f159fe
         {
             _projectListRepository = projectListRepository;
         }
 
+<<<<<<< HEAD
         public async Task Delete(int id)
+=======
+        public ProjectListService(IProjectListService @object)
+        {
+            this.@object = @object;
+        }
+
+        public async Task Delete(int? id)
+>>>>>>> 70b27eba397d84857bbd0cb5e4abd84079f159fe
         {
             await _projectListRepository.Delete(id); // Use the repository directly
         }
