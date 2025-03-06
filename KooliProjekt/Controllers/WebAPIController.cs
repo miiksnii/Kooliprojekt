@@ -8,20 +8,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KooliProjekt.Controllers
 {
-    [Route("api/TodoLists")]
+    [Route("api/ProjectItem")]
     [ApiController]
-    public class TodoListsApiController : ControllerBase
+    public class ProjectItemController : ControllerBase
     {
-        private readonly IProjectListService _service;
+        private readonly IProjectItemService _service;
 
-        public TodoListsApiController(IProjectListService service)
+        public ProjectItemController(IProjectItemService service)
         {
             _service = service;
         }
 
         // GET: api/<TodoListsApiController>
         [HttpGet]
-        public async Task<IEnumerable<ProjectList>> Get()
+        public async Task<IEnumerable<ProjectItem>> Get()
         {
             var result = await _service.List(1, 10000);
             return result.Results;
@@ -42,7 +42,7 @@ namespace KooliProjekt.Controllers
 
         // POST api/<TodoListsApiController>
         [HttpPost]
-        public async Task<object> Post([FromBody] ProjectList list)
+        public async Task<object> Post([FromBody] ProjectItem list)
         {
             await _service.Save(list);
 
@@ -51,7 +51,7 @@ namespace KooliProjekt.Controllers
 
         // PUT api/<TodoListsApiController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] ProjectList list)
+        public async Task<IActionResult> Put(int id, [FromBody] ProjectItem list)
         {
             if (id != list.Id)
             {

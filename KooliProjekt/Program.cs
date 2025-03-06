@@ -20,10 +20,12 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IProjectListService, ProjectListService>();
+builder.Services.AddScoped<IProjectItemService, ProjectItemService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //repos
 builder.Services.AddScoped<IProjectListRepository, ProjectListRepository>();
+builder.Services.AddScoped<IProjectItemRepository, ProjectItemRepository>();
 
 
 var app = builder.Build();

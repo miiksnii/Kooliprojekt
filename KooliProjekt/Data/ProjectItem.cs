@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using KooliProjekt.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace Kooliprojekt.Data
 {
-    public class ProjectItem
+    public class ProjectItem : Entity
     {
         public int Id { get; set; }
         [Required]

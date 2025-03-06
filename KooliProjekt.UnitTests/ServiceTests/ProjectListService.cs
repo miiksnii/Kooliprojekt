@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Kooliprojekt.Services;
 
 namespace KooliProjekt.UnitTests.ServiceTests
 {
@@ -16,7 +17,7 @@ namespace KooliProjekt.UnitTests.ServiceTests
     {
         private readonly Mock<IUnitOfWork> _uowMock;
         private readonly Mock<IProjectListRepository> _repositoryMock;
-        private readonly ProjectListService _projectListService;
+        private readonly ProjectItemService _projectListService;
 
         public ProjectListServiceTests()
         {
@@ -100,7 +101,7 @@ namespace KooliProjekt.UnitTests.ServiceTests
             _repositoryMock.Setup(r => r.Get(It.IsAny<int>())).ReturnsAsync(projectList);
 
             // Act
-            var result = _projectListService.ProjectListExists(1);
+            var result = _projectListService.ProjectItemExists(1);
 
             // Assert
             Assert.True(result);
@@ -113,7 +114,7 @@ namespace KooliProjekt.UnitTests.ServiceTests
             _repositoryMock.Setup(r => r.Get(It.IsAny<int>())).ReturnsAsync((ProjectList)null);
 
             // Act
-            var result = _projectListService.ProjectListExists(1);
+            var result = _projectListService.ProjectItemExists(1);
 
             // Assert
             Assert.False(result);
@@ -128,7 +129,7 @@ namespace KooliProjekt.UnitTests.ServiceTests
             _repositoryMock.Setup(r => r.Get(It.IsAny<int>())).ReturnsAsync(projectList);
 
             // Act
-            var result = _projectListService.ProjectListExists(1);
+            var result = _projectListService.ProjectItemExists(1);
 
             // Assert
             Assert.True(result);
@@ -141,7 +142,7 @@ namespace KooliProjekt.UnitTests.ServiceTests
             _repositoryMock.Setup(r => r.Get(It.IsAny<int>())).ReturnsAsync((ProjectList)null);
 
             // Act
-            var result = _projectListService.ProjectListExists(1);
+            var result = _projectListService.ProjectItemExists(1);
 
             // Assert
             Assert.False(result);

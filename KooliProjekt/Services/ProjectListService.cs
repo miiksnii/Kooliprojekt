@@ -8,13 +8,11 @@ namespace KooliProjekt.Services
 {
     public class ProjectListService : IProjectListService
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IProjectListRepository _projectListRepository;
 
 
         public ProjectListService(IUnitOfWork unitOfWork, IProjectListRepository projectListRepository)
         {
-            _unitOfWork = unitOfWork;
             _projectListRepository = projectListRepository;
         }
 

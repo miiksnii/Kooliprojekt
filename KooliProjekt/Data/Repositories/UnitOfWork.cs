@@ -17,8 +17,8 @@ namespace KooliProjekt.Data.Repositories
         }
 
         // Repository omadused
-        public IProjectListRepository ProjectListRepository { get; private set; }
-
+        public IProjectListRepository ProjectListRepository { get; private set; }    
+        public IProjectItemRepository ProjectItemRepository { get; private set; }
         // Transaktsioonide algatamine, commiteerimine ja rollback
         public async Task BeginTransaction()
         {

@@ -10,5 +10,6 @@ namespace KooliProjekt.Data.Repositories
         Task Commit();
         Task Rollback();
         IProjectListRepository ProjectListRepository { get; }
+        IProjectItemRepository ProjectItemRepository { get; }
     }
 }

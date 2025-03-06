@@ -1,4 +1,5 @@
 ﻿using KooliProjekt.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace Kooliprojekt.Data
 {
@@ -11,7 +12,6 @@ namespace Kooliprojekt.Data
         public ProjectList()
         {
             Items = new List<ProjectItem>();
-        
         }
     }
 }
