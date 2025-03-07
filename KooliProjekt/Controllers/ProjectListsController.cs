@@ -7,12 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Kooliprojekt.Data;
 using Kooliprojekt.Services;
-<<<<<<< HEAD
 using Kooliprojekt.Models;
 using KooliProjekt.Services;
-=======
-using NuGet.ContentModel;
->>>>>>> 70b27eba397d84857bbd0cb5e4abd84079f159fe
 
 namespace Kooliprojekt.Controllers
 {
@@ -70,14 +66,14 @@ namespace Kooliprojekt.Controllers
         }
 
         // GET: ProjectLists/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? id, ProjectList projectList)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var projectList = await _projectListService.Get(id.Value);  // Get by id
+            projectList = await _projectListService.Get(id.Value);  // Get by id
             if (projectList == null)
             {
                 return NotFound();
@@ -127,7 +123,5 @@ namespace Kooliprojekt.Controllers
             var projectList = _projectListService.Get(id).Result;  // .Result will block until the task completes
             return projectList != null;
         }
-
-
     }
 }

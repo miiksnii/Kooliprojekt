@@ -1,15 +1,10 @@
 ﻿using Kooliprojekt.Controllers;
-<<<<<<< HEAD
 using Kooliprojekt.Models;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
 using Moq;
-=======
-using Microsoft.AspNetCore.Mvc;
-using Xunit;
->>>>>>> 70b27eba397d84857bbd0cb5e4abd84079f159fe
 
 namespace KooliProjekt.UnitTests.ControllerTests
 {
@@ -29,7 +24,6 @@ namespace KooliProjekt.UnitTests.ControllerTests
             Assert.True(result.ViewName == "Index" ||
                         string.IsNullOrEmpty(result.ViewName));
         }
-<<<<<<< HEAD
 
         [Fact]
         public void Privacy_should_return_privacy_view()
@@ -72,9 +66,4 @@ namespace KooliProjekt.UnitTests.ControllerTests
             Assert.Equal(mockTraceIdentifier, model.RequestId); // Ensure RequestId matches the mocked TraceIdentifier
         }
     }
-    
 }
-=======
-    }
-}
->>>>>>> 70b27eba397d84857bbd0cb5e4abd84079f159fe

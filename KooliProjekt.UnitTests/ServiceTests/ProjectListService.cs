@@ -17,7 +17,7 @@ namespace KooliProjekt.UnitTests.ServiceTests
     {
         private readonly Mock<IUnitOfWork> _uowMock;
         private readonly Mock<IProjectListRepository> _repositoryMock;
-        private readonly ProjectItemService _projectListService;
+        private readonly ProjectListService _projectListService;
 
         public ProjectListServiceTests()
         {
@@ -25,7 +25,7 @@ namespace KooliProjekt.UnitTests.ServiceTests
             _repositoryMock = new Mock<IProjectListRepository>();
 
             // Pass both the IUnitOfWork and IProjectListRepository mocks to the constructor
-            _projectListService = new ProjectListService(_uowMock.Object, _repositoryMock.Object);
+            _projectListService = new ProjectListService(_repositoryMock.Object);
 
             // Set up the ProjectListRepository in the IUnitOfWork mock
             _uowMock.SetupGet(r => r.ProjectListRepository)
@@ -101,7 +101,7 @@ namespace KooliProjekt.UnitTests.ServiceTests
             _repositoryMock.Setup(r => r.Get(It.IsAny<int>())).ReturnsAsync(projectList);
 
             // Act
-            var result = _projectListService.ProjectItemExists(1);
+            var result = _projectListService.ProjectListExists(1);
 
             // Assert
             Assert.True(result);
@@ -114,7 +114,7 @@ namespace KooliProjekt.UnitTests.ServiceTests
             _repositoryMock.Setup(r => r.Get(It.IsAny<int>())).ReturnsAsync((ProjectList)null);
 
             // Act
-            var result = _projectListService.ProjectItemExists(1);
+            var result = _projectListService.ProjectListExists(1);
 
             // Assert
             Assert.False(result);
@@ -129,7 +129,7 @@ namespace KooliProjekt.UnitTests.ServiceTests
             _repositoryMock.Setup(r => r.Get(It.IsAny<int>())).ReturnsAsync(projectList);
 
             // Act
-            var result = _projectListService.ProjectItemExists(1);
+            var result = _projectListService.ProjectListExists(1);
 
             // Assert
             Assert.True(result);
@@ -142,7 +142,7 @@ namespace KooliProjekt.UnitTests.ServiceTests
             _repositoryMock.Setup(r => r.Get(It.IsAny<int>())).ReturnsAsync((ProjectList)null);
 
             // Act
-            var result = _projectListService.ProjectItemExists(1);
+            var result = _projectListService.ProjectListExists(1);
 
             // Assert
             Assert.False(result);

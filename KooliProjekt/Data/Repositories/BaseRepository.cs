@@ -28,35 +28,34 @@ namespace KooliProjekt.Data.Repositories
         {
             try
             {
-                // Handle insert (new item)
                 if (item.Id == 0)
                 {
+                    // Insert new item
                     DbContext.Set<T>().Add(item);
                 }
                 else
                 {
-                    // Handle update (existing item)
-                    var entry = DbContext.Entry(item);
-                    entry.State = EntityState.Modified;
-
-                    // Handle concurrency conflict (if applicable)
-                    try
-                    {
-                        await DbContext.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException ex)
-                    {
-                        // Handle concurrency exception (optional: log the error)
-                        throw new DbUpdateConcurrencyException("A concurrency conflict occurred while saving the data.", ex);
-                    }
+                    // Update existing item
+                    //var entry = DbContext.Entry(item);
+                    //entry.State = EntityState.Modified;
+                    DbContext.Update(item);
                 }
+
+                // Commit changes to the database
+                await DbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                // Log the concurrency exception (optional)
+                throw new DbUpdateConcurrencyException("A concurrency conflict occurred while saving the data.", ex);
             }
             catch (Exception ex)
             {
-                // Log any other exceptions here
+                // Log any other exception (optional)
                 throw new Exception("An error occurred while saving the item.", ex);
             }
         }
+
 
 
         public virtual async Task Delete(int id)

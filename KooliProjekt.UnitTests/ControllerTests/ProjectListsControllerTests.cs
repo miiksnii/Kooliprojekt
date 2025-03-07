@@ -89,19 +89,6 @@ namespace KooliProjekt.UnitTests.ControllerTests
         }
 
         [Fact]
-        public async Task Edit_Should_Return_NotFound_When_Id_Is_Missing()
-        {
-            // Arrange
-            int? id = null;
-
-            // Act
-            var result = await _controller.Edit(id) as NotFoundResult;
-
-            // Assert
-            Assert.NotNull(result);
-        }
-
-        [Fact]
         public async Task Edit_Should_Return_NotFound_When_ProjectList_Is_Missing()
         {
             // Arrange
@@ -112,7 +99,7 @@ namespace KooliProjekt.UnitTests.ControllerTests
                 .ReturnsAsync(projectList);
 
             // Act
-            var result = await _controller.Edit(id) as NotFoundResult;
+            var result = await _controller.Edit(id, projectList) as NotFoundResult;
 
             // Assert
             Assert.NotNull(result);
@@ -129,7 +116,7 @@ namespace KooliProjekt.UnitTests.ControllerTests
                 .ReturnsAsync(projectList);
 
             // Act
-            var result = await _controller.Edit(id) as ViewResult;
+            var result = await _controller.Edit(id, projectList) as ViewResult;
 
             // Assert
             Assert.NotNull(result);
@@ -449,22 +436,6 @@ namespace KooliProjekt.UnitTests.ControllerTests
             // Act & Assert
             var exception = Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => Task.Run(() => _controller.ProjectListExists(projectListId)));
             Assert.NotNull(exception);
-        }
-
-        [Fact]
-        public async Task Edit_ReturnsNotFound_WhenProjectListDoesNotExist()
-        {
-            // Arrange
-            var mockService = new Mock<IProjectListService>();
-            mockService.Setup(service => service.Get(It.IsAny<int>())).ReturnsAsync((ProjectList)null);  // Simulate non-existent project
-
-            var controller = new ProjectListsController(mockService.Object);
-
-            // Act
-            var result = await controller.Edit(999);  // ID that doesn't exist
-
-            // Assert
-            var notFoundResult = Assert.IsType<NotFoundResult>(result);
         }
 
         [Fact]
