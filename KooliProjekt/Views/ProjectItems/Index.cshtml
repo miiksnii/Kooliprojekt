@@ -1,6 +1,7 @@
 ﻿@model Kooliprojekt.Data.PagedResult<Kooliprojekt.Data.ProjectItem>
 
 
+
 @{
     ViewData["Title"] = "Index";
 }
@@ -13,7 +14,7 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
+            <th>                
                 Name
             </th>
             <th>
@@ -76,3 +77,4 @@
 }
     </tbody>
 </table>
+@(await Component.InvokeAsync<PagerViewComponent>(Model))
