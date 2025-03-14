@@ -6,7 +6,7 @@ namespace Kooliprojekt.Data
     {
         public static void Generate(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
-            if(context.ProjectItem.Any())
+            if (context.ProjectItem.Any())
             {
                 return;
             }
@@ -14,43 +14,72 @@ namespace Kooliprojekt.Data
             var adminUser = new IdentityUser
             {
                 UserName = "admin",
-                Email = "admin",
+                Email = "admin@example.com",
                 EmailConfirmed = true,
             };
 
             userManager.CreateAsync(adminUser, "Password123!").GetAwaiter().GetResult();
 
-            var list = new ProjectItem
+            var projectLists = new List<ProjectList>
+        {
+            new ProjectList { Title = "Project List 1" },
+            new ProjectList { Title = "Project List 2" },
+            new ProjectList { Title = "Project List 3" }
+        };
+
+            context.ProjectList.AddRange(projectLists);
+            context.SaveChanges();
+
+            var projectItems = new List<ProjectItem>
+        {
+            new ProjectItem
             {
-                Title = "List 1",                // Title of the project item
-                AdminName = "Kaspar",            // Admin Name
-                Name = "Kaspar",                 // Name of the project item
-                EstimatedWorkTime = 123,         // Estimated work time (in hours, I assume)
-                IsDone = false,                  // Whether the item is completed or not
-                StartDate = DateTime.Now,        // Start date (set to the current date/time)
-                ProjectListId = 1,               // Assuming the ProjectListId is 1 (or set to a valid ID)
-                ProjectList = new ProjectList
+                Title = "List 1",
+                AdminName = "Kaspar",
+                Name = "Kaspar",
+                EstimatedWorkTime = 123,
+                IsDone = false,
+                StartDate = DateTime.Now,
+                ProjectListId = projectLists[0].Id,
+                WorkLogs = new List<WorkLog>
                 {
-                    Title = "Project List Title", // Set a Title for the ProjectList
-                                                  // Initialize any other properties for ProjectList if necessary.
-                },
-                WorkLogs = new List<WorkLog>     // Optional, initializing with some work logs
-    {
-         new WorkLog
-         {
-            Date = DateTime.Now,            // Log date (current date/time)
-            TimeSpentInMinutes = 120,       // Example time spent (2 hours)
-            WorkerName = "Kaspar",          // Worker name
-            Description = "Initial project setup" // Description of work done
-         },
-    }
-            };
+                    new WorkLog { Date = DateTime.Now, TimeSpentInMinutes = 120, WorkerName = "Kaspar", Description = "Initial setup" },
+                    new WorkLog { Date = DateTime.Now, TimeSpentInMinutes = 60, WorkerName = "John", Description = "Reviewed requirements" }
+                }
+            },
+            new ProjectItem
+            {
+                Title = "List 2",
+                AdminName = "John",
+                Name = "John",
+                EstimatedWorkTime = 95,
+                IsDone = true,
+                StartDate = DateTime.Now.AddDays(-10),
+                ProjectListId = projectLists[1].Id,
+                WorkLogs = new List<WorkLog>
+                {
+                    new WorkLog { Date = DateTime.Now.AddDays(-8), TimeSpentInMinutes = 200, WorkerName = "John", Description = "Completed task setup" }
+                }
+            },
+            new ProjectItem
+            {
+                Title = "List 3",
+                AdminName = "Alice",
+                Name = "Alice",
+                EstimatedWorkTime = 45,
+                IsDone = false,
+                StartDate = DateTime.Now.AddDays(-3),
+                ProjectListId = projectLists[2].Id,
+                WorkLogs = new List<WorkLog>
+                {
+                    new WorkLog { Date = DateTime.Now, TimeSpentInMinutes = 90, WorkerName = "Alice", Description = "Started documentation" }
+                }
+            }
+        };
 
-            context.ProjectItem.Add(list);
-
-            // Veel andmeid
-
+            context.ProjectItem.AddRange(projectItems);
             context.SaveChanges();
         }
     }
+
 }
