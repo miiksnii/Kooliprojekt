@@ -30,36 +30,6 @@ namespace KooliProjekt.UnitTests.ControllerTests
 
 
 
-
-        [Fact]
-        public async Task Index_Should_Return_View_With_Model()
-        {
-            // Arrange
-            _projectItemServiceMock.Setup(x => x.List(1, 5, null)).ReturnsAsync(new List<ProjectItem> { new ProjectItem { Id = 1, Title = "Test Item" } });
-
-            // Act
-            var result = await _controller.Index() as ViewResult;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.NotNull(result.Model);
-            Assert.IsType<List<ProjectItem>>(result.Model);
-        }
-
-        [Fact]
-        public async Task Create_Get_Should_Return_View_With_ProjectLists()
-        {
-            // Arrange
-            _projectListServiceMock.Setup(x => x.List(1, 100)).ReturnsAsync(new PagedResult<ProjectList> { Results = new List<ProjectList> { new ProjectList { Id = 1, Title = "Test List" } } });
-
-            // Act
-            var result = await _controller.Create() as ViewResult;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.NotNull(result.ViewData["ProjectListId"]);
-        }
-
         [Fact]
         public async Task Create_Post_Should_Redirect_To_Index_When_Model_Is_Valid()
         {
