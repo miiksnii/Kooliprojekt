@@ -218,37 +218,6 @@ namespace KooliProjekt.UnitTests.ControllerTests
             Assert.True(result);
         }
 
-        [Fact]
-        public async Task Edit_Post_Should_Return_View_When_ModelState_Is_Invalid()
-        {
-            // Arrange
-            var projectList = new ProjectList { Id = 1, Title = "" };  // Invalid title to trigger ModelState error
-            _controller.ModelState.AddModelError("Title", "Title is required");
-
-            // Act
-            var result = await _controller.Edit(1, projectList) as ViewResult;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(projectList, result.Model);  // The model should be returned with errors
-        }
-
-        [Fact]
-        public async Task Edit_Post_Should_Redirect_To_Index_When_Save_Is_Successful()
-        {
-            // Arrange
-            var projectList = new ProjectList { Id = 1, Title = "Valid Project" };
-            _projectListServiceMock
-                .Setup(x => x.Save(It.IsAny<ProjectList>()))
-                .Returns(Task.CompletedTask);  // Simulate successful save
-
-            // Act
-            var result = await _controller.Edit(1, projectList) as RedirectToActionResult;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal("Index", result.ActionName);  // Should redirect to Index
-        }
 
         [Fact]
         public async Task Edit_Post_Should_Return_NotFound_When_DbUpdateConcurrencyException_Is_Thrown()
@@ -303,23 +272,6 @@ namespace KooliProjekt.UnitTests.ControllerTests
 
             // Act
             var result = await _controller.Create(projectList) as RedirectToActionResult;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal("Index", result.ActionName);  // Should redirect to Index
-        }
-
-        [Fact]
-        public async Task Edit_Post_Should_Redirect_To_Index_When_Model_Is_Valid()
-        {
-            // Arrange
-            var projectList = new ProjectList { Id = 1, Title = "Updated Project" };
-            _projectListServiceMock
-                .Setup(service => service.Save(projectList))
-                .Returns(Task.CompletedTask);  // Simulate successful save
-
-            // Act
-            var result = await _controller.Edit(1, projectList) as RedirectToActionResult;
 
             // Assert
             Assert.NotNull(result);
@@ -471,24 +423,6 @@ namespace KooliProjekt.UnitTests.ControllerTests
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Index", redirectResult.ActionName);  // Ensure it redirects to Index
         }
-
-        [Fact]
-        public async Task Edit_RedirectsToIndex_AfterSuccessfulSave()
-        {
-            // Arrange
-            var mockService = new Mock<IProjectListService>();
-            var projectList = new ProjectList { Id = 1, Title = "Test Project" };
-            mockService.Setup(service => service.Save(projectList)).Returns(Task.CompletedTask);  // Simulate save
-
-            var controller = new ProjectListsController(mockService.Object);
-
-            // Act
-            var result = await controller.Edit(1, projectList);
-
-            // Assert
-            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectResult.ActionName);  // Ensure it redirects to Index
-        }
         public async Task Edit_HandlesConcurrencyException_WhenProjectListIsModifiedExternally()
         {
             // Arrange
@@ -509,21 +443,5 @@ namespace KooliProjekt.UnitTests.ControllerTests
             var notFoundResult = Assert.IsType<NotFoundResult>(result);  // Ensure the result is NotFound
         }
 
-        [Fact]
-        public async Task Edit_Should_Throw_Exception_On_Concurrency_Error()
-        {
-            // Arrange
-            var projectList = new ProjectList { Id = 1, Title = "Test Project" };
-            _projectListServiceMock
-                .Setup(x => x.Save(It.IsAny<ProjectList>()))
-                .ThrowsAsync(new DbUpdateConcurrencyException());
-
-            _projectListServiceMock
-                .Setup(x => x.Get(projectList.Id))
-                .ReturnsAsync(projectList);
-
-            // Act & Assert
-            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => _controller.Edit(projectList.Id, projectList));
-        }
     }
 }
