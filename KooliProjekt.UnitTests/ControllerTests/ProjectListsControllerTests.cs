@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using Microsoft.EntityFrameworkCore;
-using KooliProjekt.Services;
 
 namespace KooliProjekt.UnitTests.ControllerTests
 {
@@ -424,26 +423,7 @@ namespace KooliProjekt.UnitTests.ControllerTests
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Index", redirectResult.ActionName);  // Ensure it redirects to Index
         }
-        public async Task Edit_HandlesConcurrencyException_WhenProjectListIsModifiedExternally()
-        {
-            // Arrange
-            var mockService = new Mock<IProjectListService>();
-            var projectList = new ProjectList { Id = 1, Title = "Test Project" };
 
-            // Set up service to return a project list and simulate concurrency exception
-            mockService.Setup(service => service.Get(1)).ReturnsAsync(projectList);
-            mockService.Setup(service => service.Save(It.IsAny<ProjectList>())).ThrowsAsync(new DbUpdateConcurrencyException());  // Simulate concurrency issue
-            mockService.Setup(service => service.ProjectListExists(It.IsAny<int>())).Returns(false);  // Return bool directly
-
-            var controller = new ProjectListsController(mockService.Object);
-
-            // Act
-            var result = await controller.Edit(1, projectList);
-
-            // Assert
-            var notFoundResult = Assert.IsType<NotFoundResult>(result);  // Ensure the result is NotFound
-           
-        }
         [Fact]
         public async Task Edit_Should_Return_NotFound_When_ProjectList_Is_Missing2()
         {

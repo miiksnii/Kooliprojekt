@@ -1,4 +1,6 @@
 ﻿using System;
+using Kooliprojekt.Controllers;
+using Kooliprojekt.Data;
 using KooliProjekt.Controllers;
 using KooliProjekt.Data;
 using Microsoft.AspNetCore.Builder;

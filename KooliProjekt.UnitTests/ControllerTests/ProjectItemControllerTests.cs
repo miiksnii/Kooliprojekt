@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using KooliProjekt.Models;
-using KooliProjekt.Services;
 using Xunit;
 using Kooliprojekt.Controllers;
 using Kooliprojekt.Data;

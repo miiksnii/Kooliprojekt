@@ -9,7 +9,6 @@ using Kooliprojekt.Data;
 using Kooliprojekt.Models;
 using Kooliprojekt.Services;
 using KooliProjekt.Models;
-using KooliProjekt.Services;
 
 namespace Kooliprojekt.Controllers
 {

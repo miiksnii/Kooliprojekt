@@ -1,44 +1,81 @@
 ﻿using Kooliprojekt.Data;
-using Kooliprojekt.Search;
-using Kooliprojekt.Services;
-using KooliProjekt.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Kooliprojekt.Search;
 
-namespace KooliProjekt.Services
+namespace Kooliprojekt.Services
 {
     public class ProjectListService : IProjectListService
     {
-        private readonly IProjectListRepository _projectListRepository;
+        private readonly ApplicationDbContext _ProjectListService;
 
-        public ProjectListService(IProjectListRepository projectListRepository)
+        public ProjectListService(ApplicationDbContext context)
         {
-            _projectListRepository = projectListRepository;
-        }
-
-        public async Task Delete(int id)
-        {
-            await _projectListRepository.Delete(id);
-        }
-
-        public async Task<ProjectList> Get(int id)
-        {
-            return await _projectListRepository.Get(id);
+            _ProjectListService = context;
         }
 
         public async Task<PagedResult<ProjectList>> List(int page, int pageSize, ProjectListSearch search = null)
         {
-            return await _projectListRepository.List(page, pageSize);
+            var query = _ProjectListService.ProjectList.AsQueryable();
+
+            if (search != null)
+            {
+                if (!string.IsNullOrWhiteSpace(search.Keyword))
+                {
+                    search.Keyword = search.Keyword.Trim();
+
+                    query = query.Where(list =>
+                        list.Title.Contains(search.Keyword) ||
+                        list.Items.Any(item => item.Title.Contains(search.Keyword))
+                    );
+                }
+
+                if (search.IsDone != null)
+                {
+                    if (search.IsDone.Value)
+                    {
+                        query = query.Where(list =>
+                            list.Items.Any() &&
+                            list.Items.All(item => item.IsDone)
+                        );
+                    }
+                    else
+                    {
+                        query = query.Where(list =>
+                            list.Items.Any(item => !item.IsDone)
+                        );
+                    }
+                }
+            }
+
+            return await query
+                .OrderBy(list => list.Title)
+                .GetPagedAsync(page, pageSize);
+        }
+
+        public async Task<ProjectList> Get(int id)
+        {
+            return await _ProjectListService.ProjectList.FindAsync(id);
         }
 
         public async Task Save(ProjectList list)
         {
-            await _projectListRepository.Save(list);
+            if (list.Id == 0)
+            {
+                _ProjectListService.ProjectList.Add(list);
+            }
+            else
+            {
+                _ProjectListService.ProjectList.Update(list);
+            }
+
+            await _ProjectListService.SaveChangesAsync();
         }
 
-        public bool ProjectListExists(int id)
+        public async Task Delete(int id)
         {
-            var projectList = _projectListRepository.Get(id).Result;
-            return projectList != null;
+            await _ProjectListService.ProjectList
+                .Where(list => list.Id == id)
+                .ExecuteDeleteAsync();
         }
     }
 }

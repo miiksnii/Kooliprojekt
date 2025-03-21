@@ -1,4 +1,5 @@
 ﻿using System;
+using Kooliprojekt.Data;
 using KooliProjekt.Data;
 using Microsoft.AspNetCore.Mvc.Testing;
 

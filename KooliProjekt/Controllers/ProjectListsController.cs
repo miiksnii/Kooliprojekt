@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Kooliprojekt.Data;
 using Kooliprojekt.Services;
 using Kooliprojekt.Models;
-using KooliProjekt.Services;
 
 namespace Kooliprojekt.Controllers
 {

@@ -1,5 +1,6 @@
 ﻿using Kooliprojekt.Data;
 using Kooliprojekt.Search;
+
 namespace Kooliprojekt.Services
 {
     public interface IProjectListService
@@ -8,13 +9,5 @@ namespace Kooliprojekt.Services
         Task<ProjectList> Get(int id);
         Task Save(ProjectList list);
         Task Delete(int id);
-        bool ProjectListExists(int id);
     }
 }
-
-
-
-
-
-
-
