@@ -1,7 +1,7 @@
 ﻿using Kooliprojekt.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Kooliprojekt.Views.Shared.Components
+namespace KooliProjekt.Components
 {
     public class PagerViewComponent : ViewComponent
     {

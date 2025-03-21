@@ -6,26 +6,36 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Kooliprojekt.Data;
+using Kooliprojekt.Models;
+using Kooliprojekt.Services;
+using KooliProjekt.Models;
+using KooliProjekt.Services;
 
 namespace Kooliprojekt.Controllers
 {
     public class ProjectItemsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IProjectListService _projectListService;
+        private readonly IProjectItemService _projectItemService;
 
-        public ProjectItemsController(ApplicationDbContext context)
+        public ProjectItemsController(
+            IProjectListService projectListService,
+            IProjectItemService projectItemService)
         {
-            _context = context;
+            _projectListService = projectListService;
+            _projectItemService = projectItemService;
         }
 
         // GET: ProjectItems
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, ProjectItemIndexModel model = null)
         {
-            var applicationDbContext = _context.ProjectItem.Include(p => p.ProjectList);
-            return View(await applicationDbContext.GetPagedAsync(page, 10));
+            model ??= new ProjectItemIndexModel();
+            model.Data = await _projectItemService.List(page, 5, model.Search);
+            return View(model.Data);  // Change this if the view expects PagedResult<ProjectItem>
         }
 
-        // GET: ProjectItems/Details/5
+
+        // GET: ProjectLists/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,9 +43,7 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var projectItem = await _context.ProjectItem
-                .Include(p => p.ProjectList)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var projectItem = await _projectItemService.Get(id.Value);
             if (projectItem == null)
             {
                 return NotFound();
@@ -45,31 +53,31 @@ namespace Kooliprojekt.Controllers
         }
 
         // GET: ProjectItems/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["ProjectListId"] = new SelectList(_context.ProjectList, "Id", "Id");
+            var projectLists = await _projectListService.List(1, 100);
+            ViewBag.ProjectListId = new SelectList(projectLists.Results,"Id", "Title");
             return View();
         }
 
         // POST: ProjectItems/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Title,StartDate,EstimatedWorkTime,AdminName,Description,IsDone,ProjectListId")] ProjectItem projectItem)
+        public async Task<IActionResult> Create(ProjectItem projectItem)
         {
-            ModelState.Remove("ProjectList");
             if (ModelState.IsValid)
             {
-                _context.Add(projectItem);
-                await _context.SaveChangesAsync();
+                await _projectItemService.Save(projectItem);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProjectListId"] = new SelectList(_context.ProjectList, "Id", "Id", projectItem.ProjectListId);
+
+            var projectLists = await _projectListService.List(1, 100);
+            ViewBag.ProjectListId = new SelectList(projectLists.Results, "Id", "Title");
+
             return View(projectItem);
         }
 
-        // GET: ProjectItems/Edit/5
+        // GET: ProjectLists/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,52 +85,35 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var projectItem = await _context.ProjectItem.FindAsync(id);
+            var projectItem = await _projectItemService.Get(id.Value);
             if (projectItem == null)
             {
                 return NotFound();
             }
-            ViewData["ProjectListId"] = new SelectList(_context.ProjectList, "Id", "Id", projectItem.ProjectListId);
             return View(projectItem);
         }
 
-        // POST: ProjectItems/Edit/5
+        // POST: TodoLists/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Title,StartDate,EstimatedWorkTime,AdminName,Description,IsDone,ProjectListId")] ProjectItem projectItem)
+        public async Task<IActionResult> Edit(int id, ProjectItem todoList)
         {
-            if (id != projectItem.Id)
+            if (id != todoList.Id)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(projectItem);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProjectItemExists(projectItem.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _projectItemService.Save(todoList);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProjectListId"] = new SelectList(_context.ProjectList, "Id", "Id", projectItem.ProjectListId);
-            return View(projectItem);
+            return View(todoList);
         }
 
-        // GET: ProjectItems/Delete/5
+        // GET: ProjectLists/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,9 +121,7 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var projectItem = await _context.ProjectItem
-                .Include(p => p.ProjectList)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var projectItem = await _projectItemService.Get(id.Value);
             if (projectItem == null)
             {
                 return NotFound();
@@ -141,24 +130,22 @@ namespace Kooliprojekt.Controllers
             return View(projectItem);
         }
 
-        // POST: ProjectItems/Delete/5
+        // POST: ProjectLists/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var projectItem = await _context.ProjectItem.FindAsync(id);
-            if (projectItem != null)
+            if (await _projectItemService.Get(id) != null)
             {
-                _context.ProjectItem.Remove(projectItem);
+                await _projectItemService.Delete(id);
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProjectItemExists(int id)
+        public async Task<bool> ProjectItemExists(int id)
         {
-            return _context.ProjectItem.Any(e => e.Id == id);
+            return await _projectItemService.Get(id) != null;
         }
     }
 }

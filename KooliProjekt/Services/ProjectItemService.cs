@@ -10,7 +10,6 @@ namespace KooliProjekt.Services
     {
         private readonly IProjectItemRepository _projectItemRepository;
 
-
         public ProjectItemService(IUnitOfWork unitOfWork, IProjectItemRepository projectItemRepository)
         {
             _projectItemRepository = projectItemRepository;
@@ -31,16 +30,18 @@ namespace KooliProjekt.Services
             return await _projectItemRepository.List(page, pageSize); // Use the repository directly
         }
 
-        public async Task Save(ProjectItem list)
+        public async Task Save(ProjectItem item)
         {
-            await _projectItemRepository.Save(list); // Use the repository directly
+            // Pass the saving logic to the repository layer
+            await _projectItemRepository.Save(item);  // No need for direct context handling here
         }
 
         public bool ProjectItemExists(int id)
         {
-            // Use the Get method to check if the ProjectList exists
-            var projectList = _projectItemRepository.Get(id).Result; // Synchronously wait for the result
-            return projectList != null;
+            // Use the Get method to check if the ProjectItem exists
+            var projectItem = _projectItemRepository.Get(id).Result; // Synchronously wait for the result
+            return projectItem != null;
         }
     }
+
 }
