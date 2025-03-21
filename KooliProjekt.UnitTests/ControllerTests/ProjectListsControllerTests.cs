@@ -79,7 +79,8 @@ namespace KooliProjekt.UnitTests.ControllerTests
         {
             // Act
             var result = _controller.Create() as ViewResult;
-
+            
+              
             // Assert
             Assert.NotNull(result);
             Assert.True(
@@ -441,7 +442,25 @@ namespace KooliProjekt.UnitTests.ControllerTests
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundResult>(result);  // Ensure the result is NotFound
+           
         }
+        [Fact]
+        public async Task Edit_Should_Return_NotFound_When_ProjectList_Is_Missing2()
+        {
+            // Arrange
+            int? id = null;
+            var projectList = (ProjectList)null;
+            _projectListServiceMock
+                .Setup(x => x.Get(1))
+                .ReturnsAsync(projectList);
+
+            // Act
+            var result = await _controller.Edit(id, projectList) as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
 
     }
 }

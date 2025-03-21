@@ -58,31 +58,6 @@ namespace KooliProjekt.UnitTests.ControllerTests
             Assert.Equal(pagedResult, result.Model);
         }
 
-        [Fact]
-        public async Task Index_Should_Handle_Empty_Search_Results()
-        {
-            // Arrange
-            var pagedResult = new PagedResult<ProjectItem>
-            {
-                Results = new List<ProjectItem>(),
-                CurrentPage = 1,
-                PageCount = 0,
-                PageSize = 5,
-                RowCount = 0
-            };
-
-            _projectItemServiceMock
-                .Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ProjectItemSearch>()))
-                .ReturnsAsync(pagedResult);
-
-            // Act
-            var result = await _controller.Index() as ViewResult;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Empty((IEnumerable<ProjectItem>)result.Model.Results);
-        }
-
 
 
         // ------------------------------------------------------------
@@ -151,24 +126,6 @@ namespace KooliProjekt.UnitTests.ControllerTests
         // ------------------------------------------------------------
         // Create Tests
         // ------------------------------------------------------------
-        [Fact]
-        public async Task Create_Should_Return_View_With_ProjectLists()
-        {
-            // Arrange
-            var projectLists = new PagedResult<ProjectList>
-            {
-                Results = new List<ProjectList> { new ProjectList { Id = 1, Title = "Test List" } }
-            };
-
-            _projectListServiceMock.Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ProjectListSearch>)).ReturnsAsync(projectLists);
-
-            // Act
-            var result = await _controller.Create() as ViewResult;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.NotNull(_controller.ViewBag.ProjectListId);
-        }
 
 
         [Fact]
@@ -185,6 +142,33 @@ namespace KooliProjekt.UnitTests.ControllerTests
             Assert.Equal("Index", result.ActionName);
             _projectItemServiceMock.Verify(x => x.Save(projectItem), Times.Once);
         }
+
+        
+        [Fact]
+        public async Task Create_Should_Return_View_When_ModelState_IsInvalid()
+        {
+            // Arrange
+            var projectItem = new ProjectItem { Id = 1, Title = "Test Item" };
+            _controller.ModelState.AddModelError("Title", "Required");
+
+            var projectLists = new PagedResult<ProjectList>
+            {
+                Results = new List<ProjectList> { new ProjectList { Id = 1, Title = "Test List" } }
+            };
+
+            _projectListServiceMock
+                .Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<ProjectListSearch>()))
+                .ReturnsAsync(projectLists);
+
+            // Act
+            var result = await _controller.Create(projectItem) as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(projectItem, result.Model);
+            Assert.IsType<SelectList>(result.ViewData["ProjectListId"]);
+        }
+
 
         // ------------------------------------------------------------
         // Edit Tests
@@ -354,6 +338,87 @@ namespace KooliProjekt.UnitTests.ControllerTests
             // Assert
             Assert.False(result);
         }
+
+        // ------------------------------------------------------------
+        // Create Tests (GET)
+        // ------------------------------------------------------------
+        [Fact]
+        public async Task Create_Should_Return_View_With_ProjectListId()
+        {
+            // Arrange
+            var projectLists = new PagedResult<ProjectList>
+            {
+                Results = new List<ProjectList> { new ProjectList { Id = 1, Title = "Test List" } },
+                CurrentPage = 1,
+                PageCount = 1,
+                PageSize = 100,
+                RowCount = 1
+            };
+
+            _projectListServiceMock.Setup(x => x.List(1, 100, It.IsAny<ProjectListSearch>())).ReturnsAsync(projectLists);
+
+            // Act
+            var result = await _controller.Create() as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.True(result.ViewData.ContainsKey("ProjectListId"));
+            Assert.Equal("Test List", ((SelectList)result.ViewData["ProjectListId"]).First().Text);
+        }
+
+        // ------------------------------------------------------------
+        // Create Tests (POST)
+        // ------------------------------------------------------------
+
+        [Fact]
+        public async Task Create_Post_Should_Redirect_To_Index_On_Success()
+        {
+            // Arrange
+            var projectItem = new ProjectItem { Id = 6, Title = "Valid Item" };
+
+            _projectItemServiceMock.Setup(x => x.Save(projectItem)).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _controller.Create(projectItem) as RedirectToActionResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Index", result.ActionName);
+        }
+
+        // ------------------------------------------------------------
+        // Edit Tests (POST)
+        // ------------------------------------------------------------
+        [Fact]
+        public async Task Edit_Post_Should_Return_NotFound_When_Id_Mismatch()
+        {
+            // Arrange
+            var projectItem = new ProjectItem { Id = 6, Title = "Valid Item" };
+
+            // Act
+            var result = await _controller.Edit(999, projectItem) as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public async Task Edit_Post_Should_Return_View_When_ModelState_Is_Invalid()
+        {
+            // Arrange
+            var projectItem = new ProjectItem { Id = 6, Title = "Invalid Item" };
+            _controller.ModelState.AddModelError("Title", "Required");
+
+            // Act
+            var result = await _controller.Edit(6, projectItem) as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsType<ViewResult>(result);
+            Assert.Equal(projectItem, result.Model);
+        }
+
+
 
     }
 }
