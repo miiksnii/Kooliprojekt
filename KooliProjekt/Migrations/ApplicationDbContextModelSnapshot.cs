@@ -22,7 +22,7 @@ namespace Kooliprojekt.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Kooliprojekt.Data.ProjectItem", b =>
+            modelBuilder.Entity("Kooliprojekt.Data.ProjectIList", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -94,7 +94,7 @@ namespace Kooliprojekt.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ProjectItemId")
+                    b.Property<int?>("ProjectIListId")
                         .HasColumnType("int");
 
                     b.Property<int>("TimeSpentInMinutes")
@@ -105,7 +105,7 @@ namespace Kooliprojekt.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectItemId");
+                    b.HasIndex("ProjectIListId");
 
                     b.ToTable("WorkLog");
                 });
@@ -308,7 +308,7 @@ namespace Kooliprojekt.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Kooliprojekt.Data.ProjectItem", b =>
+            modelBuilder.Entity("Kooliprojekt.Data.ProjectIList", b =>
                 {
                     b.HasOne("Kooliprojekt.Data.ProjectList", "ProjectList")
                         .WithMany("Items")
@@ -321,9 +321,9 @@ namespace Kooliprojekt.Migrations
 
             modelBuilder.Entity("Kooliprojekt.Data.WorkLog", b =>
                 {
-                    b.HasOne("Kooliprojekt.Data.ProjectItem", null)
+                    b.HasOne("Kooliprojekt.Data.ProjectIList", null)
                         .WithMany("WorkLogs")
-                        .HasForeignKey("ProjectItemId");
+                        .HasForeignKey("ProjectIListId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -377,7 +377,7 @@ namespace Kooliprojekt.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Kooliprojekt.Data.ProjectItem", b =>
+            modelBuilder.Entity("Kooliprojekt.Data.ProjectIList", b =>
                 {
                     b.Navigation("WorkLogs");
                 });

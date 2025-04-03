@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Kooliprojekt.Data
 {
-    public class ProjectItem : Entity
+    public class ProjectIList : Entity
     {
         public int Id { get; set; }
         [Required]

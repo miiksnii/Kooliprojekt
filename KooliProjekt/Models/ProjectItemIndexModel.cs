@@ -1,11 +1,11 @@
 ﻿using Kooliprojekt.Data;
 using Kooliprojekt.Search;
 
-namespace KooliProjekt.Models
+namespace Kooliprojekt.Models
 {
     public class ProjectItemIndexModel
     {
         public ProjectItemSearch Search { get; set; }
-        public PagedResult<ProjectItem> Data { get; set; }
+        public PagedResult<ProjectIList> Data { get; set; }
     }
 }

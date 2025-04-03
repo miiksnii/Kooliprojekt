@@ -7,7 +7,7 @@ namespace Kooliprojekt.Services
     public class ProjectListService : IProjectListService
     {
         private readonly ApplicationDbContext _ProjectListService;
-
+        public ApplicationDbContext Context => _ProjectListService;
         public ProjectListService(ApplicationDbContext context)
         {
             _ProjectListService = context;
@@ -54,7 +54,11 @@ namespace Kooliprojekt.Services
 
         public async Task<ProjectList> Get(int id)
         {
-            return await _ProjectListService.ProjectList.FindAsync(id);
+            return await _ProjectListService
+                .ProjectList
+                .Include(p => p.Items)
+                    .ThenInclude(i => i.WorkLogs)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task Save(ProjectList list)

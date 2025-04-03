@@ -9,5 +9,7 @@ namespace Kooliprojekt.Services
         Task<ProjectList> Get(int id);
         Task Save(ProjectList list);
         Task Delete(int id);
+
     }
+
 }

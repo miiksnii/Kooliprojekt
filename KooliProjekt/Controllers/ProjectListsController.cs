@@ -8,12 +8,15 @@ using Microsoft.EntityFrameworkCore;
 using Kooliprojekt.Data;
 using Kooliprojekt.Services;
 using Kooliprojekt.Models;
+using Microsoft.Data.SqlClient;
+using Microsoft.Build.Evaluation;
 
 namespace Kooliprojekt.Controllers
 {
     public class ProjectListsController : Controller
     {
         private readonly IProjectListService _projectListService;
+
 
         public ProjectListsController(IProjectListService projectListService)
         {
@@ -65,14 +68,14 @@ namespace Kooliprojekt.Controllers
         }
 
         // GET: ProjectLists/Edit/5
-        public async Task<IActionResult> Edit(int? id, ProjectList projectList)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            projectList = await _projectListService.Get(id.Value);  // Get by id
+            var projectList = await _projectListService.Get(id.Value);
             if (projectList == null)
             {
                 return NotFound();
@@ -80,11 +83,23 @@ namespace Kooliprojekt.Controllers
             return View(projectList);
         }
 
-        // POST: ProjectLists/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, ProjectList list)
+        {
+            if (id != list.Id)
+            {
+                return NotFound();
+            }
 
+            if (ModelState.IsValid)
+            {
+                await _projectListService.Save(list);
+                return RedirectToAction(nameof(Index));
+            }
 
+            return View(list);
+        }
         // GET: ProjectLists/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -93,28 +108,60 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var projectList = await _projectListService.Get(id.Value);  // Get by id
-            if (projectList == null)
+            var projectItem = await _projectListService.Get(id.Value);
+            if (projectItem == null)
             {
                 return NotFound();
             }
 
-            return View(projectList);
+            return View(projectItem);
         }
 
-        // POST: ProjectLists/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var projectList = await _projectListService.Get(id);  // Get by id
-            if (projectList != null)
+            try
             {
-                await _projectListService.Delete(id);  // Use service to delete
-            }
+                // Get the project with its items (WorkLogs will be tracked if loaded)
+                var project = await _projectListService.Get(id);
 
-            return RedirectToAction(nameof(Index));
+                if (project == null)
+                {
+                    return NotFound();
+                }
+
+                // Manually delete all WorkLogs and Items
+                if (project.Items != null)
+                {
+                    // First delete all WorkLogs
+                    foreach (var item in project.Items.ToList())
+                    {
+                        if (item.WorkLogs != null)
+                        {
+                            _projectListService.Context.WorkLogs.RemoveRange(item.WorkLogs);
+                        }
+                    }
+
+                    // Then delete all Items
+                    _projectListService.Context.ProjectIList.RemoveRange(project.Items);
+
+                    // Save changes to delete WorkLogs and Items
+                    await _projectListService.Context.SaveChangesAsync();
+                }
+
+                // Finally delete the ProjectList itself
+                await _projectListService.Delete(id);
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Delete failed: {ex.Message}";
+                return RedirectToAction(nameof(Delete), new { id });
+            }
         }
+
 
         public bool ProjectListExists(int id)
         {

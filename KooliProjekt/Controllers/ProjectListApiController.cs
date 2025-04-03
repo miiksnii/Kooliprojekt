@@ -7,20 +7,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KooliProjekt.Controllers
 {
-    [Route("api/ProjectItem")]
+    [Route("api/ProjectList")]
     [ApiController]
-    public class ProjectItemController : ControllerBase
+    public class ProjectListApiController : ControllerBase
     {
         private readonly IProjectItemService _service;
 
-        public ProjectItemController(IProjectItemService service)
+        public ProjectListApiController(IProjectItemService service)
         {
             _service = service;
         }
 
         // GET: api/<TodoListsApiController>
         [HttpGet]
-        public async Task<IEnumerable<ProjectItem>> Get()
+        public async Task<IEnumerable<ProjectIList>> Get()
         {
             var result = await _service.List(1, 10000);
             return result.Results;
@@ -41,7 +41,7 @@ namespace KooliProjekt.Controllers
 
         // POST api/<TodoListsApiController>
         [HttpPost]
-        public async Task<object> Post([FromBody] ProjectItem list)
+        public async Task<object> Post([FromBody] ProjectIList list)
         {
             await _service.Save(list);
 
@@ -50,7 +50,7 @@ namespace KooliProjekt.Controllers
 
         // PUT api/<TodoListsApiController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] ProjectItem list)
+        public async Task<IActionResult> Put(int id, [FromBody] ProjectIList list)
         {
             if (id != list.Id)
             {

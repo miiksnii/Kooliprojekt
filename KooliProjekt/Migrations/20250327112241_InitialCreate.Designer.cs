@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kooliprojekt.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250124071314_start")]
-    partial class start
+    [Migration("20250327112241_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Kooliprojekt.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Kooliprojekt.Data.ProjectItem", b =>
+            modelBuilder.Entity("Kooliprojekt.Data.ProjectIList", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -76,7 +76,6 @@ namespace Kooliprojekt.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -96,22 +95,20 @@ namespace Kooliprojekt.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ProjectItemId")
+                    b.Property<int?>("ProjectIListId")
                         .HasColumnType("int");
 
                     b.Property<int>("TimeSpentInMinutes")
                         .HasColumnType("int");
 
                     b.Property<string>("WorkerName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectItemId");
+                    b.HasIndex("ProjectIListId");
 
                     b.ToTable("WorkLog");
                 });
@@ -314,7 +311,7 @@ namespace Kooliprojekt.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Kooliprojekt.Data.ProjectItem", b =>
+            modelBuilder.Entity("Kooliprojekt.Data.ProjectIList", b =>
                 {
                     b.HasOne("Kooliprojekt.Data.ProjectList", "ProjectList")
                         .WithMany("Items")
@@ -327,9 +324,9 @@ namespace Kooliprojekt.Migrations
 
             modelBuilder.Entity("Kooliprojekt.Data.WorkLog", b =>
                 {
-                    b.HasOne("Kooliprojekt.Data.ProjectItem", null)
+                    b.HasOne("Kooliprojekt.Data.ProjectIList", null)
                         .WithMany("WorkLogs")
-                        .HasForeignKey("ProjectItemId");
+                        .HasForeignKey("ProjectIListId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -383,7 +380,7 @@ namespace Kooliprojekt.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Kooliprojekt.Data.ProjectItem", b =>
+            modelBuilder.Entity("Kooliprojekt.Data.ProjectIList", b =>
                 {
                     b.Navigation("WorkLogs");
                 });

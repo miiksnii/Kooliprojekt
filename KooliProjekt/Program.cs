@@ -20,6 +20,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 
 builder.Services.AddScoped<IProjectListService, ProjectListService>();
 builder.Services.AddScoped<IProjectItemService, ProjectItemService>();
+builder.Services.AddScoped<IWorkLogService, WorkLogService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //repos

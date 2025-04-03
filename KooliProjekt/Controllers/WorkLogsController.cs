@@ -6,22 +6,30 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Kooliprojekt.Data;
+using Kooliprojekt.Models;
+using Kooliprojekt.Services;
 
 namespace Kooliprojekt.Controllers
 {
     public class WorkLogsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IWorkLogService _workLogService;
+        private readonly IProjectItemService _projectItemService;
 
-        public WorkLogsController(ApplicationDbContext context)
+        public WorkLogsController(
+            IWorkLogService workLogService,
+            IProjectItemService projectItemService)
         {
-            _context = context;
+            _workLogService = workLogService;
+            _projectItemService = projectItemService;
         }
 
         // GET: WorkLogs
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, WorkLogIndexModel model = null)
         {
-            return View(await _context.WorkLog.GetPagedAsync(page, 10));
+            model ??= new WorkLogIndexModel();
+            model.Data = await _workLogService.List(page, 10, model.Search);
+            return View(model);
         }
 
         // GET: WorkLogs/Details/5
@@ -32,8 +40,7 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var workLog = await _context.WorkLog
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var workLog = await _workLogService.Get(id.Value);
             if (workLog == null)
             {
                 return NotFound();
@@ -43,24 +50,26 @@ namespace Kooliprojekt.Controllers
         }
 
         // GET: WorkLogs/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var projectItems = await _projectItemService.List(1, 100);
+            ViewBag.ProjectIListId = new SelectList(projectItems.Results, "Id", "Title");
             return View();
         }
 
         // POST: WorkLogs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Date,TimeSpentInMinutes,WorkerName,Description")] WorkLog workLog)
+        public async Task<IActionResult> Create([Bind("Id,Date,TimeSpentInMinutes,WorkerName,Description,ProjectIListId")] WorkLog workLog)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(workLog);
-                await _context.SaveChangesAsync();
+                await _workLogService.Save(workLog);
                 return RedirectToAction(nameof(Index));
             }
+
+            var projectItems = await _projectItemService.List(1, 100);
+            ViewBag.ProjectIListId = new SelectList(projectItems.Results, "Id", "Title");
             return View(workLog);
         }
 
@@ -72,17 +81,18 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var workLog = await _context.WorkLog.FindAsync(id);
+            var workLog = await _workLogService.Get(id.Value);
             if (workLog == null)
             {
                 return NotFound();
             }
+
+            var projectItems = await _projectItemService.List(1, 100);
+            ViewBag.ProjectIListId = new SelectList(projectItems.Results, "Id", "Title", workLog.Id);
             return View(workLog);
         }
 
         // POST: WorkLogs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Date,TimeSpentInMinutes,WorkerName,Description")] WorkLog workLog)
@@ -94,24 +104,12 @@ namespace Kooliprojekt.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(workLog);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!WorkLogExists(workLog.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _workLogService.Save(workLog);
                 return RedirectToAction(nameof(Index));
             }
+
+            var projectItems = await _projectItemService.List(1, 100);
+            ViewBag.ProjectIListId = new SelectList(projectItems.Results, "Id", "Title", workLog.Id);
             return View(workLog);
         }
 
@@ -123,8 +121,7 @@ namespace Kooliprojekt.Controllers
                 return NotFound();
             }
 
-            var workLog = await _context.WorkLog
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var workLog = await _workLogService.Get(id.Value);
             if (workLog == null)
             {
                 return NotFound();
@@ -138,19 +135,8 @@ namespace Kooliprojekt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var workLog = await _context.WorkLog.FindAsync(id);
-            if (workLog != null)
-            {
-                _context.WorkLog.Remove(workLog);
-            }
-
-            await _context.SaveChangesAsync();
+            await _workLogService.Delete(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool WorkLogExists(int id)
-        {
-            return _context.WorkLog.Any(e => e.Id == id);
         }
     }
 }

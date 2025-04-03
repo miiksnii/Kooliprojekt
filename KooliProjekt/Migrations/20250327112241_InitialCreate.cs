@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Kooliprojekt.Migrations
 {
     /// <inheritdoc />
-    public partial class start : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -56,7 +56,7 @@ namespace Kooliprojekt.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -203,16 +203,16 @@ namespace Kooliprojekt.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TimeSpentInMinutes = table.Column<int>(type: "int", nullable: false),
-                    WorkerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProjectItemId = table.Column<int>(type: "int", nullable: true)
+                    WorkerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProjectIListId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkLog", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WorkLog_ProjectItem_ProjectItemId",
-                        column: x => x.ProjectItemId,
+                        name: "FK_WorkLog_ProjectItem_ProjectIListId",
+                        column: x => x.ProjectIListId,
                         principalTable: "ProjectItem",
                         principalColumn: "Id");
                 });
@@ -262,9 +262,9 @@ namespace Kooliprojekt.Migrations
                 column: "ProjectListId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkLog_ProjectItemId",
+                name: "IX_WorkLog_ProjectIListId",
                 table: "WorkLog",
-                column: "ProjectItemId");
+                column: "ProjectIListId");
         }
 
         /// <inheritdoc />

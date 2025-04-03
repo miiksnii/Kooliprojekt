@@ -1,6 +1,7 @@
 ﻿@model WorkLogIndexModel;
 
 
+
 @{
     ViewData["Title"] = "Index";
 }
@@ -52,4 +53,5 @@
 }
     </tbody>
 </table>
-@(await Component.InvokeAsync<PagerViewComponent>(Model.Data))
+@(await Component.InvokeAsync<PagerViewComponent>(Model.Data))  <!-- Correct -->
+

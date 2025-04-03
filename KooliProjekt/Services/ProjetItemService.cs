@@ -13,7 +13,7 @@ namespace Kooliprojekt.Services
             _ProjectItemService = context;
         }
 
-        public async Task<PagedResult<ProjectItem>> List(int page, int pageSize, ProjectItemSearch search = null)
+        public async Task<PagedResult<ProjectIList>> List(int page, int pageSize, ProjectItemSearch search = null)
         {
             var query = _ProjectItemService.ProjectItem.AsQueryable();
 
@@ -46,12 +46,12 @@ namespace Kooliprojekt.Services
                 .GetPagedAsync(page, pageSize);
         }
 
-        public async Task<ProjectItem> Get(int id)
+        public async Task<ProjectIList> Get(int id)
         {
             return await _ProjectItemService.ProjectItem.FindAsync(id);
         }
 
-        public async Task Save(ProjectItem item)
+        public async Task Save(ProjectIList item)
         {
             if (item.Id == 0)
             {

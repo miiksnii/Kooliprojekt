@@ -30,9 +30,9 @@ namespace Kooliprojekt.Data
             context.ProjectList.AddRange(projectLists);
             context.SaveChanges();
 
-            var projectItems = new List<ProjectItem>
+            var projectItems = new List<ProjectIList>
         {
-            new ProjectItem
+            new ProjectIList
             {
                 Title = "List 1",
                 AdminName = "Kaspar",
@@ -47,7 +47,7 @@ namespace Kooliprojekt.Data
                     new WorkLog { Date = DateTime.Now, TimeSpentInMinutes = 60, WorkerName = "John", Description = "Reviewed requirements" }
                 }
             },
-            new ProjectItem
+            new ProjectIList
             {
                 Title = "List 2",
                 AdminName = "John",
@@ -61,7 +61,7 @@ namespace Kooliprojekt.Data
                     new WorkLog { Date = DateTime.Now.AddDays(-8), TimeSpentInMinutes = 200, WorkerName = "John", Description = "Completed task setup" }
                 }
             },
-            new ProjectItem
+            new ProjectIList
             {
                 Title = "List 3",
                 AdminName = "Alice",

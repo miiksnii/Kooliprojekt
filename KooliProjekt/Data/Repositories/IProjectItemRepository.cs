@@ -5,9 +5,9 @@ namespace KooliProjekt.Data.Repositories
 {
     public interface IProjectItemRepository
     {
-        Task<ProjectItem> Get(int id);
-        Task<PagedResult<ProjectItem>> List(int page, int pageSize, ProjectItemSearch search = null);
-        Task Save(ProjectItem item);
+        Task<ProjectIList> Get(int id);
+        Task<PagedResult<ProjectIList>> List(int page, int pageSize, ProjectItemSearch search = null);
+        Task Save(ProjectIList item);
         Task Delete(int id);
     }
 }

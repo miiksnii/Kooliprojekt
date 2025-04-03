@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Kooliprojekt.Data;
 using Kooliprojekt.Models;
 using Kooliprojekt.Services;
-using KooliProjekt.Models;
+using Kooliprojekt.Models;
 
 namespace Kooliprojekt.Controllers
 {
@@ -28,11 +28,10 @@ namespace Kooliprojekt.Controllers
         // GET: ProjectItems
         public async Task<IActionResult> Index(int page = 1, ProjectItemIndexModel model = null)
         {
-            model ??= new ProjectItemIndexModel();
+            model = model ?? new ProjectItemIndexModel();
             model.Data = await _projectItemService.List(page, 5, model.Search);
-            return View(model.Data);  // Change this if the view expects PagedResult<ProjectItem>
+            return View(model);  
         }
-
 
         // GET: ProjectLists/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -62,7 +61,7 @@ namespace Kooliprojekt.Controllers
         // POST: ProjectItems/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ProjectItem projectItem)
+        public async Task<IActionResult> Create(ProjectIList projectItem)
         {
             if (ModelState.IsValid)
             {
@@ -89,6 +88,11 @@ namespace Kooliprojekt.Controllers
             {
                 return NotFound();
             }
+
+            // Add this - same as in Create action
+            var projectLists = await _projectListService.List(1, 100);
+            ViewBag.ProjectListId = new SelectList(projectLists.Results, "Id", "Title", projectItem.ProjectListId);
+
             return View(projectItem);
         }
 
@@ -97,13 +101,13 @@ namespace Kooliprojekt.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ProjectItem todoList)
+        public async Task<IActionResult> Edit(int id, ProjectIList todoList)
         {
             if (id != todoList.Id)
             {
                 return NotFound();
             }
-
+            
             if (ModelState.IsValid)
             {
                 await _projectItemService.Save(todoList);

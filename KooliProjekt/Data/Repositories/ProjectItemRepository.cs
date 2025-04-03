@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Kooliprojekt.Search;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-public class ProjectItemRepository : BaseRepository<ProjectItem>, IProjectItemRepository
+public class ProjectItemRepository : BaseRepository<ProjectIList>, IProjectItemRepository
 {
     public ProjectItemRepository(ApplicationDbContext context) : base(context)
     {
     }
 
-    public override async Task<ProjectItem> Get(int id)
+    public override async Task<ProjectIList> Get(int id)
     {
         return await DbContext.ProjectItem
             .Include(list => list.WorkLogs)
@@ -18,7 +18,7 @@ public class ProjectItemRepository : BaseRepository<ProjectItem>, IProjectItemRe
             .FirstOrDefaultAsync();
     }
 
-public async Task<PagedResult<ProjectItem>> List(int page, int pageSize, ProjectItemSearch search = null)
+public async Task<PagedResult<ProjectIList>> List(int page, int pageSize, ProjectItemSearch search = null)
 {
     var query = DbContext.ProjectItem.AsQueryable();
     search = search ?? new ProjectItemSearch();
