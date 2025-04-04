@@ -121,45 +121,8 @@ namespace Kooliprojekt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            try
-            {
-                // Get the project with its items (WorkLogs will be tracked if loaded)
-                var project = await _projectListService.Get(id);
-
-                if (project == null)
-                {
-                    return NotFound();
-                }
-
-                // Manually delete all WorkLogs and Items
-                if (project.Items != null)
-                {
-                    // First delete all WorkLogs
-                    foreach (var item in project.Items.ToList())
-                    {
-                        if (item.WorkLogs != null)
-                        {
-                            _projectListService.Context.WorkLogs.RemoveRange(item.WorkLogs);
-                        }
-                    }
-
-                    // Then delete all Items
-                    _projectListService.Context.ProjectIList.RemoveRange(project.Items);
-
-                    // Save changes to delete WorkLogs and Items
-                    await _projectListService.Context.SaveChangesAsync();
-                }
-
-                // Finally delete the ProjectList itself
-                await _projectListService.Delete(id);
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Delete failed: {ex.Message}";
-                return RedirectToAction(nameof(Delete), new { id });
-            }
+            await _projectListService.DeleteWithDependenciesAsync(id);
+            return RedirectToAction(nameof(Index));
         }
 
 

@@ -6,16 +6,36 @@ namespace Kooliprojekt.Services
 {
     public class ProjectListService : IProjectListService
     {
-        private readonly ApplicationDbContext _ProjectListService;
-        public ApplicationDbContext Context => _ProjectListService;
+        private readonly ApplicationDbContext _context;
         public ProjectListService(ApplicationDbContext context)
         {
-            _ProjectListService = context;
+            _context = context;
         }
+        public async Task DeleteWithDependenciesAsync(int id)
+        {
+            var projectList = await _context.ProjectList
+                .Include(p => p.Items)
+                    .ThenInclude(i => i.WorkLogs)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
+            if (projectList == null) return;
+
+            // Delete WorkLogs
+            _context.WorkLog.RemoveRange(
+                projectList.Items.SelectMany(i => i.WorkLogs)
+            );
+
+            // Delete ProjectItem items
+            _context.ProjectItem.RemoveRange(projectList.Items);
+
+            // Delete ProjectList
+            _context.ProjectList.Remove(projectList);
+
+            await _context.SaveChangesAsync();
+        }
         public async Task<PagedResult<ProjectList>> List(int page, int pageSize, ProjectListSearch search = null)
         {
-            var query = _ProjectListService.ProjectList.AsQueryable();
+            var query = _context.ProjectList.AsQueryable();
 
             if (search != null)
             {
@@ -54,7 +74,7 @@ namespace Kooliprojekt.Services
 
         public async Task<ProjectList> Get(int id)
         {
-            return await _ProjectListService
+            return await _context
                 .ProjectList
                 .Include(p => p.Items)
                     .ThenInclude(i => i.WorkLogs)
@@ -65,19 +85,19 @@ namespace Kooliprojekt.Services
         {
             if (list.Id == 0)
             {
-                _ProjectListService.ProjectList.Add(list);
+                _context.ProjectList.Add(list);
             }
             else
             {
-                _ProjectListService.ProjectList.Update(list);
+                _context.ProjectList.Update(list);
             }
 
-            await _ProjectListService.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
 
         public async Task Delete(int id)
         {
-            await _ProjectListService.ProjectList
+            await _context.ProjectList
                 .Where(list => list.Id == id)
                 .ExecuteDeleteAsync();
         }
