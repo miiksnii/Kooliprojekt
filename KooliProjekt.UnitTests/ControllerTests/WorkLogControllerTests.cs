@@ -218,5 +218,148 @@ namespace KooliProjekt.UnitTests.ControllerTests
             Assert.Equal("Index", result.ActionName);
             _mockWorkLogService.Verify(s => s.Delete(1), Times.Once);
         }
+
+        [Fact]
+        public async Task Details_should_return_notfound_when_id_is_null()
+        {
+            // Act
+            var result = await _controller.Details(null) as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public async Task Details_should_return_notfound_when_worklog_not_found()
+        {
+            // Arrange
+            _mockWorkLogService.Setup(s => s.Get(It.IsAny<int>()))
+                .ReturnsAsync((WorkLog)null);
+
+            // Act
+            var result = await _controller.Details(1) as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public async Task Details_should_return_view_with_model_when_worklog_exists()
+        {
+            // Arrange
+            var workLog = new WorkLog { Id = 1, WorkerName = "Worker", Description = "Task" };
+            _mockWorkLogService.Setup(s => s.Get(1))
+                .ReturnsAsync(workLog);
+
+            // Act
+            var result = await _controller.Details(1) as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsType<WorkLog>(result.Model);
+            Assert.Equal(workLog, result.Model);
+        }
+
+        [Fact]
+        public async Task Edit_GET_should_return_notfound_when_id_is_null()
+        {
+            // Act
+            var result = await _controller.Edit(null) as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public async Task Edit_GET_should_return_notfound_when_worklog_not_found()
+        {
+            // Arrange
+            _mockWorkLogService.Setup(s => s.Get(It.IsAny<int>()))
+                .ReturnsAsync((WorkLog)null);
+
+            // Act
+            var result = await _controller.Edit(1) as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public async Task Edit_GET_should_return_view_with_model_when_worklog_exists()
+        {
+            // Arrange
+            var workLog = new WorkLog { Id = 1, WorkerName = "Worker", Description = "Task" };
+            var projectItems = new PagedResult<ProjectIList>
+            {
+                Results = new List<ProjectIList> { new ProjectIList { Id = 1, Title = "Item 1" } }
+            };
+
+            _mockWorkLogService.Setup(s => s.Get(1))
+                .ReturnsAsync(workLog);
+            _mockProjectItemService.Setup(s => s.List(1, 100, It.IsAny<ProjectItemSearch>()))
+                .ReturnsAsync(projectItems);
+
+            // Act
+            var result = await _controller.Edit(1) as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsType<WorkLog>(result.Model);
+            Assert.Equal(workLog, result.Model);
+            Assert.NotNull(result.ViewData["ProjectIListId"]);
+        }
+
+        [Fact]
+        public async Task Index_should_handle_null_model()
+        {
+            // Arrange
+            var expectedData = new PagedResult<WorkLog> { Results = new List<WorkLog>() };
+            _mockWorkLogService.Setup(s => s.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<WorkLogSearch>()))
+                .ReturnsAsync(expectedData);
+
+            // Act
+            var result = await _controller.Index(1, null) as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsType<WorkLogIndexModel>(result.Model);
+        }
+        [Fact]
+        public async Task Create_POST_should_save_and_redirect_when_model_is_valid()
+        {
+            // Arrange
+            var validWorkLog = new WorkLog
+            {
+                Id = 1,
+                Date = DateTime.Now,
+                TimeSpentInMinutes = 60,
+                WorkerName = "Test Worker",
+                Description = "Test Description",
+            };
+
+            // Mock the project items list for repopulation if needed
+            var projectItems = new PagedResult<ProjectIList>
+            {
+                Results = new List<ProjectIList>
+        {
+            new ProjectIList { Id = 1, Title = "Project 1" }
+        }
+            };
+
+            _mockProjectItemService.Setup(s => s.List(1, 100, null))
+                .ReturnsAsync(projectItems);
+
+            // Act
+            var result = await _controller.Create(validWorkLog) as RedirectToActionResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Index", result.ActionName);
+            _mockWorkLogService.Verify(s => s.Save(validWorkLog), Times.Once);
+
+            // Verify project items weren't fetched unnecessarily when model was valid
+            _mockProjectItemService.Verify(s => s.List(1, 100, null), Times.Never);
+        }
+
     }
 }
