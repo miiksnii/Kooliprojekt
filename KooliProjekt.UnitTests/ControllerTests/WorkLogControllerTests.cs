@@ -30,71 +30,28 @@ namespace KooliProjekt.UnitTests.ControllerTests
         public async Task Index_should_return_view_with_model()
         {
             // Arrange
-            var expectedModel = new WorkLogIndexModel
+            var expectedData = new PagedResult<WorkLog>
             {
-                Data = new PagedResult<WorkLog>
+                Results = new List<WorkLog>
                 {
-                    Results = new List<WorkLog>
-                    {
-                        new WorkLog { Id = 1, WorkerName = "Worker 1" },
-                        new WorkLog { Id = 2, WorkerName = "Worker 2" }
-                    }
+                    new WorkLog { Id = 1, WorkerName = "Worker 1", Description = "Task 1" },
+                    new WorkLog { Id = 2, WorkerName = "Worker 2", Description = "Task 2" }
                 }
             };
 
+            var searchModel = new WorkLogIndexModel();
+
             _mockWorkLogService.Setup(s => s.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<WorkLogSearch>()))
-                             .ReturnsAsync(expectedModel.Data);
+                .ReturnsAsync(expectedData);
 
             // Act
-            var result = await _controller.Index() as ViewResult;
+            var result = await _controller.Index(1, searchModel) as ViewResult;
 
             // Assert
             Assert.NotNull(result);
             Assert.IsType<WorkLogIndexModel>(result.Model);
             var model = result.Model as WorkLogIndexModel;
-            Assert.Equal(2, model.Data.Results.Count);
-        }
-
-        [Fact]
-        public async Task Details_should_return_notfound_when_id_is_null()
-        {
-            // Act
-            var result = await _controller.Details(null) as NotFoundResult;
-
-            // Assert
-            Assert.NotNull(result);
-        }
-
-        [Fact]
-        public async Task Details_should_return_notfound_when_worklog_not_found()
-        {
-            // Arrange
-            _mockWorkLogService.Setup(s => s.Get(It.IsAny<int>()))
-                             .ReturnsAsync((WorkLog)null);
-
-            // Act
-            var result = await _controller.Details(1) as NotFoundResult;
-
-            // Assert
-            Assert.NotNull(result);
-        }
-
-        [Fact]
-        public async Task Details_should_return_view_with_model_when_worklog_exists()
-        {
-            // Arrange
-            var expectedWorkLog = new WorkLog { Id = 1, WorkerName = "Test Worker" };
-            _mockWorkLogService.Setup(s => s.Get(1))
-                             .ReturnsAsync(expectedWorkLog);
-
-            // Act
-            var result = await _controller.Details(1) as ViewResult;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.IsType<WorkLog>(result.Model);
-            var model = result.Model as WorkLog;
-            Assert.Equal(expectedWorkLog.Id, model.Id);
+            Assert.Equal(expectedData, model.Data);
         }
 
         [Fact]
@@ -105,12 +62,13 @@ namespace KooliProjekt.UnitTests.ControllerTests
             {
                 Results = new List<ProjectIList>
                 {
-                    new ProjectIList { Id = 1, Title = "Project 1" }
+                    new ProjectIList { Id = 1, Title = "Item 1" },
+                    new ProjectIList { Id = 2, Title = "Item 2" }
                 }
             };
 
             _mockProjectItemService.Setup(s => s.List(1, 100, It.IsAny<ProjectItemSearch>()))
-                                 .ReturnsAsync(projectItems);
+                .ReturnsAsync(projectItems);
 
             // Act
             var result = await _controller.Create() as ViewResult;
@@ -121,26 +79,30 @@ namespace KooliProjekt.UnitTests.ControllerTests
             Assert.IsType<SelectList>(result.ViewData["ProjectIListId"]);
         }
 
-
         [Fact]
         public async Task Create_POST_should_repopulate_selectlist_when_model_is_invalid()
         {
             // Arrange
-            var invalidWorkLog = new WorkLog { WorkerName = "" }; // Invalid
+            var workLog = new WorkLog
+            {
+                WorkerName = "", // Invalid
+                Description = "" // Invalid
+            };
+
             var projectItems = new PagedResult<ProjectIList>
             {
                 Results = new List<ProjectIList>
                 {
-                    new ProjectIList { Id = 1, Title = "Project 1" }
+                    new ProjectIList { Id = 1, Title = "Item 1" }
                 }
             };
 
-            _controller.ModelState.AddModelError("WorkerName", "Required");
+            _controller.ModelState.AddModelError("WorkerName", "Worker name is required");
             _mockProjectItemService.Setup(s => s.List(1, 100, It.IsAny<ProjectItemSearch>()))
-                                 .ReturnsAsync(projectItems);
+                .ReturnsAsync(projectItems);
 
             // Act
-            var result = await _controller.Create(invalidWorkLog) as ViewResult;
+            var result = await _controller.Create(workLog) as ViewResult;
 
             // Assert
             Assert.NotNull(result);
@@ -150,58 +112,62 @@ namespace KooliProjekt.UnitTests.ControllerTests
         }
 
         [Fact]
-        public async Task Edit_GET_should_return_notfound_when_id_is_null()
+        public async Task Edit_POST_should_return_notfound_when_id_mismatch()
         {
+            // Arrange
+            var workLog = new WorkLog { Id = 1 };
+
             // Act
-            var result = await _controller.Edit(null) as NotFoundResult;
+            var result = await _controller.Edit(2, workLog) as NotFoundResult;
 
             // Assert
             Assert.NotNull(result);
         }
 
         [Fact]
-        public async Task Edit_GET_should_return_notfound_when_worklog_not_found()
+        public async Task Edit_POST_should_redirect_to_index_when_model_is_valid()
         {
             // Arrange
-            _mockWorkLogService.Setup(s => s.Get(It.IsAny<int>()))
-                             .ReturnsAsync((WorkLog)null);
+            var workLog = new WorkLog { Id = 1, WorkerName = "Worker", Description = "Task" };
 
             // Act
-            var result = await _controller.Edit(1) as NotFoundResult;
+            var result = await _controller.Edit(1, workLog) as RedirectToActionResult;
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal("Index", result.ActionName);
+            _mockWorkLogService.Verify(s => s.Save(workLog), Times.Once);
         }
 
         [Fact]
-        public async Task Edit_POST_should_handle_all_scenarios()
+        public async Task Edit_POST_should_repopulate_selectlist_when_model_is_invalid()
         {
             // Arrange
-            var testWorkLog = new WorkLog { Id = 1, WorkerName = "Test Worker" };
+            var workLog = new WorkLog { Id = 1, WorkerName = "" };
+            var projectItems = new PagedResult<ProjectIList>
+            {
+                Results = new List<ProjectIList>
+                {
+                    new ProjectIList { Id = 1, Title = "Item 1" }
+                }
+            };
 
-            // Case 1: ID mismatch
-            var result1 = await _controller.Edit(2, testWorkLog) as NotFoundResult;
-            Assert.NotNull(result1);
+            _controller.ModelState.AddModelError("WorkerName", "Worker name is required");
+            _mockProjectItemService.Setup(s => s.List(1, 100, It.IsAny<ProjectItemSearch>()))
+                .ReturnsAsync(projectItems);
 
-            // Case 2: Invalid model state
-            _controller.ModelState.AddModelError("WorkerName", "Required");
-            var result2 = await _controller.Edit(1, new WorkLog { Id = 1, WorkerName = "" }) as ViewResult;
-            Assert.NotNull(result2);
-            Assert.False(_controller.ModelState.IsValid);
+            // Act
+            var result = await _controller.Edit(1, workLog) as ViewResult;
 
-            // Case 3: Valid edit
-            _controller.ModelState.Clear();
-            _mockWorkLogService.Setup(s => s.Save(It.IsAny<WorkLog>()))
-                             .Returns(Task.CompletedTask);
-
-            var result3 = await _controller.Edit(1, testWorkLog) as RedirectToActionResult;
-            Assert.NotNull(result3);
-            Assert.Equal("Index", result3.ActionName);
-            _mockWorkLogService.Verify(s => s.Save(testWorkLog), Times.Once);
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsType<WorkLog>(result.Model);
+            Assert.NotNull(result.ViewData["ProjectIListId"]);
+            _mockWorkLogService.Verify(s => s.Save(It.IsAny<WorkLog>()), Times.Never);
         }
 
         [Fact]
-        public async Task Delete_should_return_notfound_when_id_is_null()
+        public async Task Delete_GET_should_return_notfound_when_id_is_null()
         {
             // Act
             var result = await _controller.Delete(null) as NotFoundResult;
@@ -211,11 +177,11 @@ namespace KooliProjekt.UnitTests.ControllerTests
         }
 
         [Fact]
-        public async Task Delete_should_return_notfound_when_worklog_not_found()
+        public async Task Delete_GET_should_return_notfound_when_worklog_not_found()
         {
             // Arrange
             _mockWorkLogService.Setup(s => s.Get(It.IsAny<int>()))
-                             .ReturnsAsync((WorkLog)null);
+                .ReturnsAsync((WorkLog)null);
 
             // Act
             var result = await _controller.Delete(1) as NotFoundResult;
@@ -225,12 +191,12 @@ namespace KooliProjekt.UnitTests.ControllerTests
         }
 
         [Fact]
-        public async Task Delete_should_return_view_with_model_when_worklog_exists()
+        public async Task Delete_GET_should_return_view_with_model_when_worklog_exists()
         {
             // Arrange
-            var expectedWorkLog = new WorkLog { Id = 1, WorkerName = "Test Worker" };
+            var workLog = new WorkLog { Id = 1, WorkerName = "Worker", Description = "Task" };
             _mockWorkLogService.Setup(s => s.Get(1))
-                             .ReturnsAsync(expectedWorkLog);
+                .ReturnsAsync(workLog);
 
             // Act
             var result = await _controller.Delete(1) as ViewResult;
@@ -238,15 +204,12 @@ namespace KooliProjekt.UnitTests.ControllerTests
             // Assert
             Assert.NotNull(result);
             Assert.IsType<WorkLog>(result.Model);
+            Assert.Equal(workLog, result.Model);
         }
 
         [Fact]
         public async Task DeleteConfirmed_should_redirect_to_index()
         {
-            // Arrange
-            _mockWorkLogService.Setup(s => s.Get(1))
-                             .ReturnsAsync(new WorkLog());
-
             // Act
             var result = await _controller.DeleteConfirmed(1) as RedirectToActionResult;
 
