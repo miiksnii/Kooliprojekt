@@ -9,8 +9,8 @@ namespace Kooliprojekt.Data
         : base(options)
     { }
 
-    public DbSet<ProjectIList> ProjectItem { get; set; }
-    public DbSet<ProjectList> ProjectList { get; set; }
-    public DbSet<WorkLog> WorkLog { get; set; }
+    public virtual DbSet<ProjectIList> ProjectItem { get; set; }
+    public virtual DbSet<ProjectList> ProjectList { get; set; }
+    public virtual DbSet<WorkLog> WorkLog { get; set; }
     }
 }
