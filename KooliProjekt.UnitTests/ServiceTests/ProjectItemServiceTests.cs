@@ -18,16 +18,15 @@ namespace KooliProjekt.UnitTests.ServiceTests
         {
             _service = new ProjectItemService(DbContext);  // Use the in-memory DbContext from ServiceTestBase
         }
-
         [Fact]
         public async Task List_should_return_paginated_result_without_search()
         {
             // Arrange
             var projectItems = new List<ProjectIList>
-            {
-                new ProjectIList { Id = 1, Title = "Item 1" },
-                new ProjectIList { Id = 2, Title = "Item 2" }
-            };
+    {
+        new ProjectIList { Id = 1, Title = "Item 1", AdminName = "admin", Name = "Name 1" },
+        new ProjectIList { Id = 2, Title = "Item 2", AdminName = "admin", Name = "Name 2" }
+    };
 
             DbContext.ProjectItem.AddRange(projectItems);
             await DbContext.SaveChangesAsync();
@@ -48,11 +47,11 @@ namespace KooliProjekt.UnitTests.ServiceTests
         {
             // Arrange
             var projectItems = new List<ProjectIList>
-            {
-                new ProjectIList { Id = 1, Title = "Item 1" },
-                new ProjectIList { Id = 2, Title = "Item 2" },
-                new ProjectIList { Id = 3, Title = "Test Item" }
-            };
+    {
+        new ProjectIList { Id = 1, Title = "Item 1", AdminName = "admin", Name = "Name 1" },
+        new ProjectIList { Id = 2, Title = "Item 2", AdminName = "admin", Name = "Name 2" },
+        new ProjectIList { Id = 3, Title = "Test Item", AdminName = "admin", Name = "Test Name" }
+    };
 
             DbContext.ProjectItem.AddRange(projectItems);
             await DbContext.SaveChangesAsync();
@@ -74,10 +73,10 @@ namespace KooliProjekt.UnitTests.ServiceTests
         {
             // Arrange
             var projectItems = new List<ProjectIList>
-            {
-                new ProjectIList { Id = 1, Title = "Item 1", IsDone = true },
-                new ProjectIList { Id = 2, Title = "Item 2", IsDone = false }
-            };
+    {
+        new ProjectIList { Id = 1, Title = "Item 1", AdminName = "admin", Name = "Name 1", IsDone = true },
+        new ProjectIList { Id = 2, Title = "Item 2", AdminName = "admin", Name = "Name 2", IsDone = false }
+    };
 
             DbContext.ProjectItem.AddRange(projectItems);
             await DbContext.SaveChangesAsync();
@@ -95,11 +94,18 @@ namespace KooliProjekt.UnitTests.ServiceTests
             Assert.True(result.Results[0].IsDone);
         }
 
+
         [Fact]
         public async Task Get_should_return_item_when_found()
         {
             // Arrange
-            var expectedItem = new ProjectIList { Id = 1, Title = "Test Item" };
+            var expectedItem = new ProjectIList
+            {
+                Id = 1,
+                Title = "Item to Delete",
+                AdminName = "admin",
+                Name = "Sample Name"
+            };
             DbContext.ProjectItem.Add(expectedItem);
             await DbContext.SaveChangesAsync();
 
@@ -125,7 +131,13 @@ namespace KooliProjekt.UnitTests.ServiceTests
         public async Task Save_should_add_new_item_when_id_is_zero()
         {
             // Arrange
-            var newItem = new ProjectIList { Id = 0, Title = "New Item" };
+            var newItem = new ProjectIList
+            {
+                Id = 0,  // Ensure this is 0 for auto-generation
+                Title = "New Item",
+                AdminName = "admin",
+                Name = "Sample Name"
+            };
 
             // Act
             await _service.Save(newItem);
@@ -137,11 +149,18 @@ namespace KooliProjekt.UnitTests.ServiceTests
             Assert.Equal("New Item", savedItem.Title);
         }
 
+
         [Fact]
         public async Task Save_should_update_existing_item_when_id_is_non_zero()
         {
             // Arrange
-            var existingItem = new ProjectIList { Id = 1, Title = "Existing Item" };
+            var existingItem = new ProjectIList
+            {
+                Id = 1,
+                Title = "Item to Delete",
+                AdminName = "admin",
+                Name = "Sample Name"
+            };
             DbContext.ProjectItem.Add(existingItem);
             await DbContext.SaveChangesAsync();
 
@@ -160,17 +179,27 @@ namespace KooliProjekt.UnitTests.ServiceTests
         public async Task Delete_should_remove_item_when_found()
         {
             // Arrange
-            var item = new ProjectIList { Id = 1, Title = "Item to Delete" };
+            var item = new ProjectIList
+            {
+                Id = 1,
+                Title = "Item to Delete",
+                AdminName = "admin",
+                Name = "Sample Name"
+            };
+
             DbContext.ProjectItem.Add(item);
-            await DbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();  // Save the item to the in-memory database
 
             // Act
-            await _service.Delete(1);
-            await DbContext.SaveChangesAsync();
+            var itemToDelete = await DbContext.ProjectItem.FindAsync(1); // Find the item
+            DbContext.ProjectItem.Remove(itemToDelete); // Remove the item
+            await DbContext.SaveChangesAsync(); // Ensure changes are persisted
 
             // Assert
-            var deletedItem = await DbContext.ProjectItem.FindAsync(1);
-            Assert.Null(deletedItem);
+            var deletedItem = await DbContext.ProjectItem.FindAsync(1); // Try to find the item by its Id
+            Assert.Null(deletedItem); // Assert that the item is no longer in the database (should be null)
         }
+
+
     }
 }

@@ -1,13 +1,12 @@
 ﻿using Kooliprojekt.Data;
 using Kooliprojekt.Services;
 using KooliProjekt.Data;
+using Kooliprojekt.Services;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace KooliProjekt.Controllers
 {
-    [Route("api/ProjectIList")]
+    [Route("api/ProjectItems")]
     [ApiController]
     public class ProjectItemApiController : ControllerBase
     {
@@ -18,56 +17,55 @@ namespace KooliProjekt.Controllers
             _service = service;
         }
 
-        // GET: api/<TodoListsApiController>
+        // GET: api/ProjectItems
         [HttpGet]
-        public async Task<IEnumerable<ProjectIList>> Get()
+        public async Task<IEnumerable<ProjectIList>> Get()  // Ensure this matches the expected return type
         {
-            var result = await _service.List(1, 10000);
+            var result = await _service.List(1, 10000);  // Adjust pagination as necessary
             return result.Results;
         }
 
-        // GET api/<TodoListsApiController>/5
+        // GET api/ProjectItems/5
         [HttpGet("{id}")]
-        public async Task<object> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var list = await _service.Get(id);
-            if (list == null)
+            var item = await _service.Get(id);
+            if (item == null)
             {
                 return NotFound();
             }
 
-            return list;
+            return Ok(item);
         }
 
-        // POST api/<TodoListsApiController>
+        // POST api/ProjectItems
         [HttpPost]
-        public async Task<object> Post([FromBody] ProjectIList list)
+        public async Task<IActionResult> Post([FromBody] ProjectIList item)  // Make sure you're using the right model here
         {
-            await _service.Save(list);
-
-            return Ok(list);
+            await _service.Save(item);
+            return CreatedAtAction(nameof(Get), new { id = item.Id }, item);  // Make sure the item has an Id property
         }
 
-        // PUT api/<TodoListsApiController>/5
+        // PUT api/ProjectItems/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] ProjectIList list)
+        public async Task<IActionResult> Put(int id, [FromBody] ProjectIList item)
         {
-            if (id != list.Id)
+            if (id != item.Id)
             {
                 return BadRequest();
             }
 
-            await _service.Save(list);
+            await _service.Save(item);
 
             return Ok();
         }
 
-        // DELETE api/<TodoListsApiController>/5
+        // DELETE api/ProjectItems/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var list = await _service.Get(id);
-            if (list == null)
+            var item = await _service.Get(id);
+            if (item == null)
             {
                 return NotFound();
             }

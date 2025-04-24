@@ -1,34 +1,32 @@
-﻿using Kooliprojekt.Data;
+﻿using KooliProjekt.Data;
 using Kooliprojekt.Services;
-using KooliProjekt.Data;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Kooliprojekt.Data;
 
 namespace KooliProjekt.Controllers
 {
     [Route("api/ProjectList")]
     [ApiController]
-    public class ProjectListApiController : ControllerBase
+    public class ProjectListApiController : ControllerBase  // Renamed the controller to ProjectListApiController
     {
-        private readonly IProjectItemService _service;
+        private readonly IProjectListService _service;
 
-        public ProjectListApiController(IProjectItemService service)
+        public ProjectListApiController(IProjectListService service)  // Renamed constructor
         {
             _service = service;
         }
 
-        // GET: api/<TodoListsApiController>
+        // GET: api/ProjectList
         [HttpGet]
-        public async Task<IEnumerable<ProjectIList>> Get()
+        public async Task<IEnumerable<ProjectList>> Get()  // Changed TodoList to ProjectList
         {
             var result = await _service.List(1, 10000);
             return result.Results;
         }
 
-        // GET api/<TodoListsApiController>/5
+        // GET api/ProjectList/5
         [HttpGet("{id}")]
-        public async Task<object> Get(int id)
+        public async Task<object> Get(int id)  // Changed TodoList to ProjectList
         {
             var list = await _service.Get(id);
             if (list == null)
@@ -39,18 +37,18 @@ namespace KooliProjekt.Controllers
             return list;
         }
 
-        // POST api/<TodoListsApiController>
+        // POST api/ProjectList
         [HttpPost]
-        public async Task<object> Post([FromBody] ProjectIList list)
+        public async Task<object> Post([FromBody] ProjectList list)  // Changed TodoList to ProjectList
         {
             await _service.Save(list);
 
             return Ok(list);
         }
 
-        // PUT api/<TodoListsApiController>/5
+        // PUT api/ProjectList/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] ProjectIList list)
+        public async Task<IActionResult> Put(int id, [FromBody] ProjectList list)  // Changed TodoList to ProjectList
         {
             if (id != list.Id)
             {
@@ -62,9 +60,9 @@ namespace KooliProjekt.Controllers
             return Ok();
         }
 
-        // DELETE api/<TodoListsApiController>/5
+        // DELETE api/ProjectList/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)  // Changed TodoList to ProjectList
         {
             var list = await _service.Get(id);
             if (list == null)
