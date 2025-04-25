@@ -1,0 +1,35 @@
+﻿<Window x:Class="KooliProjekt.WpfApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- DataGrid to display lists -->
+        <DataGrid x:Name="TodoListsGrid"
+                  Grid.Column="0"
+                  ItemsSource="{Binding Lists}"
+                  SelectedItem="{Binding SelectedItem}"
+                  AutoGenerateColumns="True"
+                  Margin="10" />
+
+        <!-- StackPanel for form elements and buttons -->
+        <StackPanel Grid.Column="1" Margin="10">
+            <TextBlock Text="ID" />
+            <TextBlock Text="{Binding SelectedItem.Id}" />
+
+            <TextBlock Text="Title" />
+            <TextBox Text="{Binding SelectedItem.Title}" />
+
+            <!-- Buttons for commands -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                <Button Command="{Binding NewCommand}" Margin="5">New</Button>
+                <Button Command="{Binding SaveCommand}" Margin="5">Save</Button>
+                <Button Command="{Binding DeleteCommand}" Margin="5">Delete</Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
