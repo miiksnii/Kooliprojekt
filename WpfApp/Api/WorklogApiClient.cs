@@ -3,11 +3,11 @@ using System.Net.Http.Json;
 
 namespace KooliProjekt.WpfApp.Api
 {
-    public class ApiClient : IApiClient
+    public class WorklogApiClient : IWorklogApiClient
     {
         private readonly HttpClient _httpClient;
 
-        public ApiClient()
+        public WorklogApiClient()
         {
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri("https://localhost:7136/api/");
@@ -17,8 +17,10 @@ namespace KooliProjekt.WpfApp.Api
         {
             var result = await _httpClient.GetFromJsonAsync<List<WorkLog>>("TodoLists");
 
-            return result;
+            // Ensure result is not null by providing a default empty list if result is null
+            return result ?? new List<WorkLog>();
         }
+
 
         public async Task Save(WorkLog list)
         {

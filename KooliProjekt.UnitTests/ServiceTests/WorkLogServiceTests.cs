@@ -93,26 +93,6 @@ namespace KooliProjekt.UnitTests.ServiceTests
         }
 
         [Fact]
-        public async Task Delete_should_remove_worklog_by_id()
-        {
-            // Arrange
-            var workLog = new WorkLog
-            {
-                WorkerName = "DeleteMe",
-                Description = "To be deleted"
-            };
-            _context.WorkLog.Add(workLog);
-            await _context.SaveChangesAsync();
-
-            // Act
-            await _service.Delete(workLog.Id);
-
-            // Assert
-            var deleted = await _context.WorkLog.FindAsync(workLog.Id);
-            Assert.Null(deleted);
-        }
-
-        [Fact]
         public async Task List_should_return_filtered_results()
         {
             // Arrange

@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
 
 namespace KooliProjekt.WpfApp
 {
@@ -13,14 +14,11 @@ namespace KooliProjekt.WpfApp
 
         public RelayCommand(Action<T> execute, Predicate<T> canExecute)
         {
-            if (execute == null)
-                throw new ArgumentNullException("execute");
-
-            _execute = execute;
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
         }
 
-        public bool CanExecute(object parameter)
+        public bool CanExecute(object? parameter)
         {
             return _canExecute == null || _canExecute((T)parameter);
         }
@@ -34,6 +32,12 @@ namespace KooliProjekt.WpfApp
         public void Execute(object parameter)
         {
             _execute((T)parameter);
+        }
+
+        // This method raises CanExecuteChanged
+        public void RaiseCanExecuteChanged()
+        {
+            CommandManager.InvalidateRequerySuggested();
         }
     }
 }

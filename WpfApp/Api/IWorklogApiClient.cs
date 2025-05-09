@@ -1,6 +1,6 @@
 ﻿namespace KooliProjekt.WpfApp.Api
 {
-    public interface IApiClient
+    public interface IWorklogApiClient
     {
         Task<List<WorkLog>> List();
         Task Save(WorkLog list);

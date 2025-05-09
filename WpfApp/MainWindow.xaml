@@ -12,23 +12,26 @@
         <DataGrid x:Name="TodoListsGrid"
                   Grid.Column="0"
                   ItemsSource="{Binding Lists}"
-                  SelectedItem="{Binding SelectedItem}"
+                  SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                   AutoGenerateColumns="True"
                   Margin="10" />
 
         <!-- StackPanel for form elements and buttons -->
         <StackPanel Grid.Column="1" Margin="10">
+            <!-- Binding ID -->
             <TextBlock Text="ID" />
             <TextBlock Text="{Binding SelectedItem.Id}" />
 
+            <!-- Binding Title with null check -->
             <TextBlock Text="Title" />
-            <TextBox Text="{Binding SelectedItem.Title}" />
+            <TextBox Text="{Binding SelectedItem.Title, TargetNullValue=''}" TextChanged="TextBox_TextChanged" />
+            <!-- Binding Title, with an empty string if SelectedItem is null -->
 
             <!-- Buttons for commands -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-                <Button Command="{Binding NewCommand}" Margin="5">New</Button>
-                <Button Command="{Binding SaveCommand}" Margin="5">Save</Button>
-                <Button Command="{Binding DeleteCommand}" Margin="5">Delete</Button>
+                <Button Command="{Binding NewCommand}" Margin="5" Content="New" />
+                <Button Command="{Binding SaveCommand}" Margin="5" Content="Save" />
+                <Button Command="{Binding DeleteCommand}" Margin="5" Content="Delete" />
             </StackPanel>
         </StackPanel>
     </Grid>

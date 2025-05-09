@@ -7,8 +7,8 @@ namespace KooliProjekt.WpfApp
     {
         public MainWindow()
         {
-            InitializeComponent();  // This initializes the XAML UI components
-            Loaded += MainWindow_Loaded;
+            InitializeComponent();
+            DataContext = new MainWindowViewModel(); // Set DataContext to ViewModel
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -28,6 +28,11 @@ namespace KooliProjekt.WpfApp
             DataContext = viewModel;
 
             await viewModel.Load();
+        }
+
+        private void TextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+
         }
     }
 }

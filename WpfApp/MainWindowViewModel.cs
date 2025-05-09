@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using KooliProjekt.WpfApp.Api;
+using System.Threading.Tasks;
 
 namespace KooliProjekt.WpfApp
 {
@@ -12,87 +13,64 @@ namespace KooliProjekt.WpfApp
         public ICommand DeleteCommand { get; private set; }
         public Predicate<WorkLog> ConfirmDelete { get; set; }
 
-        private readonly IApiClient _apiClient;
+        private readonly IWorklogApiClient _apiClient;
 
-        public MainWindowViewModel() : this(new ApiClient())
+        private WorkLog _selectedItem;
+        public WorkLog SelectedItem
+        {
+            get { return _selectedItem; }
+            set
+            {
+                _selectedItem = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public MainWindowViewModel() : this(new WorklogApiClient())
         {
         }
 
-        public MainWindowViewModel(IApiClient apiClient)
+        public MainWindowViewModel(IWorklogApiClient apiClient)
         {
             _apiClient = apiClient;
 
             Lists = new ObservableCollection<WorkLog>();
 
-            NewCommand = new RelayCommand<WorkLog>(
-                // Execute
-                list =>
-                {
-                    SelectedItem = new WorkLog();
-                }
-            );
+            NewCommand = new RelayCommand<WorkLog>(list =>
+            {
+                SelectedItem = new WorkLog(); // Create a new empty WorkLog when 'New' is clicked
+            });
 
-            SaveCommand = new RelayCommand<WorkLog>(
-                // Execute
-                async list =>
+            SaveCommand = new RelayCommand<WorkLog>(async list =>
+            {
+                if (SelectedItem != null)
                 {
                     await _apiClient.Save(SelectedItem);
                     await Load();
-                },
-                // CanExecute
-                list =>
-                {
-                    return SelectedItem != null;
                 }
-            );
+            }, list => SelectedItem != null); // CanExecute is based on whether SelectedItem is null
 
-            DeleteCommand = new RelayCommand<WorkLog>(
-                // Execute
-                async list =>
+            DeleteCommand = new RelayCommand<WorkLog>(async list =>
+            {
+                if (ConfirmDelete != null)
                 {
-                    if(ConfirmDelete != null)
-                    {
-                        var result = ConfirmDelete(SelectedItem);
-                        if(!result)
-                        {
-                            return;
-                        }
-                    }
-
-                    await _apiClient.Delete(SelectedItem.Id);
-                    Lists.Remove(SelectedItem);
-                    SelectedItem = null;
-                },
-                // CanExecute
-                list =>
-                {
-                    return SelectedItem != null;
+                    var result = ConfirmDelete(SelectedItem);
+                    if (!result) return;
                 }
-            );
+
+                await _apiClient.Delete(SelectedItem.Id);
+                Lists.Remove(SelectedItem);
+                SelectedItem = null;
+            }, list => SelectedItem != null); // CanExecute is based on whether SelectedItem is null
         }
 
         public async Task Load()
         {
             Lists.Clear();
-
             var lists = await _apiClient.List();
-            foreach(var list in lists)
+            foreach (var list in lists)
             {
                 Lists.Add(list);
-            }
-        }
-
-        private WorkLog _selectedItem;
-        public WorkLog SelectedItem
-        {
-            get
-            {
-                return _selectedItem;
-            }
-            set
-            {
-                _selectedItem = value;
-                NotifyPropertyChanged();
             }
         }
     }
