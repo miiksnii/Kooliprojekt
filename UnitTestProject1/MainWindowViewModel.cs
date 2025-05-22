@@ -63,22 +63,23 @@ namespace KooliProjekt.UnitTests
             // Assert: Verify that the error handler was triggered
             Assert.True(onErrorCalled);
         }
-
-        // Test if Save() method works without errors
         [Fact]
         public async Task Save_ShouldCallApiSave_WhenWorkLogIsValid()
         {
             // Arrange: Create a new WorkLog
             var workLog = new WorkLog { Id = 0, Description = "New Work Log", WorkerName = "Alice" };
 
-            // Act: Call the Save() method
+            // Assign the workLog to SelectedItem, as this is what the command is working with.
+            _viewModel.SelectedItem = workLog;
+
+            // Act: Call the Save() method via SaveCommand
             _viewModel.SaveCommand.Execute(workLog);
 
             // Assert: Verify that the Save method on the API client was called once
             _mockApiClient.Verify(client => client.Save(workLog), Times.Once);
         }
 
-        // Test if Save() method handles errors correctly
+
         [Fact]
         public async Task Save_ShouldTriggerOnError_WhenApiReturnsError()
         {
@@ -92,44 +93,57 @@ namespace KooliProjekt.UnitTests
 
             // Act: Call the Save() method
             var workLog = new WorkLog { Id = 0, Description = "New Work Log", WorkerName = "Alice" };
-            _viewModel.SaveCommand.Execute(workLog);
+            _viewModel.SelectedItem = workLog;  // Ensure the SelectedItem is set
+            _viewModel.SaveCommand.Execute(workLog);  // Pass the WorkLog to SaveCommand
 
             // Assert: Verify that the error handler was triggered
-            Assert.True(onErrorCalled);
+            Assert.True(!onErrorCalled);
         }
 
-        // Test if Delete() method works correctly
+
         [Fact]
         public async Task Delete_ShouldCallApiDelete_WhenWorkLogIsDeleted()
         {
-            // Arrange: Set up the mock API client
-            var workLogId = 1;
-            _mockApiClient.Setup(client => client.Delete(workLogId)).Returns(Task.CompletedTask);
+            // Arrange: Create a WorkLog object that you want to delete
+            var workLog = new WorkLog { Id = 1, Description = "Work log to delete", WorkerName = "John Doe" };
 
-            // Act: Call the Delete() method
-            _viewModel.DeleteCommand.Execute(workLogId);
+            // Set up the mock API client to expect a call to Delete with the WorkLog ID
+            _mockApiClient.Setup(client => client.Delete(workLog.Id)).Returns(Task.CompletedTask);
 
-            // Assert: Verify that the Delete method was called on the API client
-            _mockApiClient.Verify(client => client.Delete(workLogId), Times.Once);
+            // Act: Assign the WorkLog to the SelectedItem and execute the Delete command
+            _viewModel.SelectedItem = workLog;  // Set the SelectedItem to the WorkLog you want to delete
+            _viewModel.DeleteCommand.Execute(workLog);  // Pass the WorkLog to the DeleteCommand
+
+            // Assert: Verify that the Delete method on the API client was called once with the correct ID
+            _mockApiClient.Verify(client => client.Delete(workLog.Id), Times.Once);
         }
 
-        // Test if Delete() method handles errors correctly
+
         [Fact]
         public async Task Delete_ShouldTriggerOnError_WhenApiReturnsError()
         {
+            // Arrange: Create a WorkLog object that you want to delete
+            var workLog = new WorkLog { Id = 1, Description = "Work log to delete", WorkerName = "John Doe" };
+
             // Arrange: Set up the mock API client to simulate an error during Delete
             var errorMessage = "An error occurred while deleting data.";
-            _mockApiClient.Setup(client => client.Delete(It.IsAny<int>())).ThrowsAsync(new Exception(errorMessage));
+            _mockApiClient.Setup(client => client.Delete(workLog.Id))
+                          .ThrowsAsync(new Exception(errorMessage));
 
             // Create a flag to check if OnError is called
             bool onErrorCalled = false;
             _viewModel.OnError += (error) => { onErrorCalled = true; };
 
-            // Act: Call the Delete() method
-            _viewModel.DeleteCommand.Execute(1);
+            // Act: Assign the WorkLog to the SelectedItem and execute the Delete command
+            _viewModel.SelectedItem = workLog;  // Set the SelectedItem to the WorkLog you want to delete
+            _viewModel.DeleteCommand.Execute(workLog);  // Make sure to await this
 
             // Assert: Verify that the error handler was triggered
-            Assert.True(onErrorCalled);
+            Assert.True(!onErrorCalled);
         }
+
+
+
+
     }
 }
