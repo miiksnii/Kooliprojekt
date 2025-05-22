@@ -23,6 +23,8 @@ builder.Services.AddScoped<IProjectItemService, ProjectItemService>();
 builder.Services.AddScoped<IWorkLogService, WorkLogService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+
+
 //repos
 builder.Services.AddScoped<IProjectListRepository, ProjectListRepository>();
 builder.Services.AddScoped<IProjectItemRepository, ProjectItemRepository>();
