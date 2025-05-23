@@ -141,9 +141,5 @@ namespace KooliProjekt.UnitTests
             // Assert: Verify that the error handler was triggered
             Assert.True(!onErrorCalled);
         }
-
-
-
-
     }
 }
