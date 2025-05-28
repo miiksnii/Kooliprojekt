@@ -1,0 +1,63 @@
+﻿@page "/"
+@inject HttpClient Http
+
+<PageTitle>Home</PageTitle>
+
+<h1>Work Logs</h1>
+
+<p>This component fetches work logs from your API endpoint.</p>
+
+@if (worklogs == null)
+{
+        <p><em>Loading...</em></p>
+}
+else if (worklogs.Length == 0)
+{
+        <p><em>No work logs found.</em></p>
+}
+else
+{
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Project Id</th>
+                    <th>Date</th>
+                    <th>Hours</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var log in worklogs)
+            {
+                        <tr>
+                            <td>@log.Id</td>
+                            <td>@log.ProjectId</td>
+                            <td>@log.Date.ToShortDateString()</td>
+                            <td>@log.Hours</td>
+                            <td>@log.Description</td>
+                        </tr>
+            }
+            </tbody>
+        </table>
+}
+
+@code {
+    private WorkLog[]? worklogs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // GET https://localhost:7282/api/worklogs
+        worklogs = await Http.GetFromJsonAsync<WorkLog[]>("worklogs");
+    }
+
+    // Mudeli klass – kohanda väljade nimed ja tüübid vastavalt oma API-le
+    public class WorkLog
+    {
+        public int Id { get; set; }
+        public int ProjectId { get; set; }
+        public DateTime Date { get; set; }
+        public double Hours { get; set; }
+        public string? Description { get; set; }
+    }
+}

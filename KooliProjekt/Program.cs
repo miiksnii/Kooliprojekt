@@ -31,6 +31,7 @@ builder.Services.AddScoped<IProjectItemRepository, ProjectItemRepository>();
 
 
 var app = builder.Build();
+builder.Services.AddCors();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -41,6 +42,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseCors(
+       options => options.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+);
 
 app.UseRouting();
 
