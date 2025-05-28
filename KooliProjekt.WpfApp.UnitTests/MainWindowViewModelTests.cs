@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using KooliProjekt.WpfApp;
-using KooliProjekt.WpfApp.Api;
+using KooliProjekt.PublicApi.Api;
 using Moq;
 using Xunit;
+
 
 namespace KooliProjekt.WpfApp.UnitTests
 {

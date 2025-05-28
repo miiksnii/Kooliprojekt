@@ -1,4 +1,8 @@
-﻿namespace KooliProjekt.WinFormsApp
+﻿
+using KooliProjekt.PublicApi.Api;    
+using KooliProjekt.PublicApi;          
+
+namespace KooliProjekt.WinFormsApp
 {
     partial class Form1
     {

@@ -29,8 +29,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\KooliProjekt.UnitTests\KooliProjekt.UnitTests.csproj" />
-    <ProjectReference Include="..\KooliProjekt\KooliProjekt.csproj" />
+	  <ProjectReference Include="..\KooliProjekt\KooliProjekt.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">

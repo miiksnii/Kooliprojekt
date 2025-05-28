@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using KooliProjekt.WpfApp.Api;
+using KooliProjekt.PublicApi.Api;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KooliProjekt.WpfApp

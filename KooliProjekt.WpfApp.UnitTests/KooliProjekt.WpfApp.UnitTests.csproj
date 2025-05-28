@@ -17,9 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Documents\KooliProjekt.WpfApp\KooliProjekt.WpfApp.csproj" />
+    <ProjectReference Include="..\Kooliprojekt.PublicApi\Kooliprojekt.PublicApi.csproj" />
+    <ProjectReference Include="..\KooliProjekt.WpfApp\KooliProjekt.WpfApp.csproj" />
+    <ProjectReference Include="..\Kooliprojekt\Kooliprojekt.csproj" />
   </ItemGroup>
-
+        
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>

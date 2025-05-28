@@ -32,7 +32,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\KooliProjekt\KooliProjekt.csproj" />
+    <ProjectReference Include="..\Kooliprojekt.PublicApi\Kooliprojekt.PublicApi.csproj" />
+    <ProjectReference Include="..\Kooliprojekt\Kooliprojekt.csproj" />
   </ItemGroup>
+
+
+
 
 </Project>

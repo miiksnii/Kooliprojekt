@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using KooliProjekt.WinFormsApp;
-using KooliProjekt.WinFormsApp.Api;
+using KooliProjekt.PublicApi.Api;
 using Moq;
 using Xunit;
 
