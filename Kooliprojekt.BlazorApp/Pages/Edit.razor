@@ -1,0 +1,77 @@
+﻿@page "/create"
+@page "/edit/{Id:int}"
+
+@using KooliProjekt.PublicApi.Api
+@inject IApiClient apiClient
+@inject NavigationManager NavManager
+
+<h3>@title töölogi</h3>
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+        <div class="alert alert-danger">@errorMessage</div>
+}
+
+<EditForm Model="@workLog" OnValidSubmit="@FormSubmitted">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Kuupäev</label>
+        <InputDate @bind-Value="workLog.Date" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Minutid</label>
+        <InputNumber @bind-Value="workLog.TimeSpentInMinutes" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Töötaja nimi</label>
+        <InputText @bind-Value="workLog.WorkerName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Kirjeldus</label>
+        <InputTextArea @bind-Value="workLog.Description" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvesta</button>
+</EditForm>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private WorkLog workLog = new WorkLog();
+    private string title = "Lisa";
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            title = "Muuda";
+            var result = await apiClient.Get(Id);
+
+            if (result.Value != null)
+            {
+                workLog = result.Value;
+            }
+            else
+            {
+                errorMessage = result.Error ?? "Töölogi ei leitud.";
+            }
+        }
+    }
+
+    private async Task FormSubmitted()
+    {
+        try
+        {
+            await apiClient.Save(workLog);
+            NavManager.NavigateTo("/worklogs");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Salvestamine ebaõnnestus: {ex.Message}";
+        }
+    }
+
+}

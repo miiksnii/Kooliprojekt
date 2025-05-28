@@ -10,7 +10,8 @@ namespace KooliProjekt.PublicApi.Api
         public ApiClient()
         {
             _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri("https://localhost:7282/api/Worklogs");
+            _httpClient.BaseAddress = new Uri("https://localhost:7282/api/worklogs/");
+
         }
 
         public async Task<Result<List<WorkLog>>> List()
@@ -40,21 +41,55 @@ namespace KooliProjekt.PublicApi.Api
             return result;
         }
 
+        public async Task<Result<WorkLog>> Get(int id)
+        {
+            var result = new Result<WorkLog>();
+
+            try
+            {
+                var response = await _httpClient.GetAsync($"{id}"); // ← siit ära "/" + id
+                if (response.IsSuccessStatusCode)
+                {
+                    result.Value = await response.Content.ReadFromJsonAsync<WorkLog>();
+                }
+                else
+                {
+                    result.Error = $"Töölogi ID-ga {id} ei leitud.";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Error = ex.Message;
+            }
+
+            return result;
+        }
+
+
         public async Task Save(WorkLog list)
         {
-            if(list.Id == 0)
+            HttpResponseMessage response;
+
+            if (list.Id == 0)
             {
-                await _httpClient.PostAsJsonAsync("", list);
+                response = await _httpClient.PostAsJsonAsync("", list);
             }
             else
             {
-                await _httpClient.PutAsJsonAsync("/" + list.Id, list);
+                response = await _httpClient.PutAsJsonAsync(list.Id.ToString(), list);
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorText = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Salvestamine ebaõnnestus: {response.StatusCode} - {errorText}");
             }
         }
 
+
         public async Task Delete(int id)
         {
-            await _httpClient.DeleteAsync("/" + id);
+            await _httpClient.DeleteAsync(id.ToString()); 
         }
     }
 }

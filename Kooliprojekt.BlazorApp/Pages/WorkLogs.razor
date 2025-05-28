@@ -1,0 +1,88 @@
+﻿@page "/worklogs"
+
+@using KooliProjekt.PublicApi.Api
+@inject IApiClient apiClient
+@inject NavigationManager NavManager
+@inject IJSRuntime JS
+
+<h3>Töölogide nimekiri</h3>
+
+@if (!string.IsNullOrWhiteSpace(successMessage))
+{
+        <div class="alert alert-success" role="alert">@successMessage</div>
+}
+
+@if (workLogs == null)
+{
+        <p><em>Laadin...</em></p>
+}
+else if (workLogs.Count == 0)
+{
+        <p>Ühtegi töölogi ei leitud.</p>
+}
+else
+{
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Kuupäev</th>
+                    <th>Minutid</th>
+                    <th>Töötaja nimi</th>
+                    <th>Kirjeldus</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var log in workLogs)
+            {
+                    <tr>
+                        <td>@log.Date.ToShortDateString()</td>
+                        <td>@log.TimeSpentInMinutes</td>
+                        <td>@log.WorkerName</td>
+                        <td>@log.Description</td>
+                        <td>
+                                    <button class="btn btn-sm btn-warning me-2" @onclick="() => Edit(log.Id)">Muuda</button>
+
+                            <button class="btn btn-sm btn-danger" @onclick="() => Delete(log.Id)">Kustuta</button>
+                        </td>
+                    </tr>
+            }
+            </tbody>
+        </table>
+}
+
+<button class="btn btn-primary" @onclick="Create">Lisa uus töölogi</button>
+
+@code {
+    private List<WorkLog>? workLogs;
+    private string successMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await apiClient.List();
+        workLogs = result.Value ?? new List<WorkLog>();
+    }
+
+    private void Edit(int id)
+    {
+        NavManager.NavigateTo($"/edit/{id}");
+    }
+
+
+    private void Create()
+    {
+        NavManager.NavigateTo("/create");
+    }
+
+    private async Task Delete(int id)
+    {
+        var confirm = await JS.InvokeAsync<bool>("confirm", "Kas oled kindel, et soovid selle töölogi kustutada?");
+        if (!confirm)
+            return;
+
+        await apiClient.Delete(id);
+        var result = await apiClient.List();
+        workLogs = result.Value ?? new List<WorkLog>();
+        successMessage = "Töölogi on kustutatud.";
+    }
+}

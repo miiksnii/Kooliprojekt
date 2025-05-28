@@ -58,10 +58,17 @@ namespace Kooliprojekt.Services
             }
             else
             {
-                _context.WorkLog.Update(log);
+                var existing = await _context.WorkLog.FindAsync(log.Id);
+                if (existing != null)
+                {
+                    // Uuendab ainult väärtusi juba jälgitavas entiteedis
+                    _context.Entry(existing).CurrentValues.SetValues(log);
+                }
             }
+
             await _context.SaveChangesAsync();
         }
+
 
         public async Task Delete(int id)
         {
