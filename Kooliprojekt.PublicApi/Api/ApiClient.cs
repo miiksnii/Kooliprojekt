@@ -66,25 +66,27 @@ namespace KooliProjekt.PublicApi.Api
         }
 
 
-        public async Task Save(WorkLog list)
+        public async Task<Result> Save(WorkLog workLog)
         {
             HttpResponseMessage response;
 
-            if (list.Id == 0)
+            if (workLog.Id == 0)
             {
-                response = await _httpClient.PostAsJsonAsync("", list);
+                response = await _httpClient.PostAsJsonAsync("", workLog);
             }
             else
             {
-                response = await _httpClient.PutAsJsonAsync(list.Id.ToString(), list);
+                response = await _httpClient.PutAsJsonAsync(workLog.Id.ToString(), workLog);
             }
 
             if (!response.IsSuccessStatusCode)
             {
-                var errorText = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Salvestamine ebaõnnestus: {response.StatusCode} - {errorText}");
+                return await response.Content.ReadFromJsonAsync<Result>();
             }
+
+            return new Result();
         }
+
 
 
         public async Task Delete(int id)

@@ -1,15 +1,32 @@
 ﻿namespace KooliProjekt.PublicApi.Api
 {
-    public class Result
-    {
-        public string Error { get; set; }
-
-        public bool HasError
+        public class Result
         {
-            get
+            public Dictionary<string, List<string>> Errors { get; set; }
+
+            public Result()
             {
-                return !string.IsNullOrEmpty(Error);
+                Errors = new Dictionary<string, List<string>>();
             }
+
+            public bool HasError
+            {
+                get
+                {
+                    return Errors.Count > 0;
+                }
+            }
+
+            public void AddError(string propertyName, string errorMessage)
+            {
+                if (!Errors.ContainsKey(propertyName))
+                {
+                    Errors.Add(propertyName, new List<string>());
+                }
+
+                Errors[propertyName].Add(errorMessage);
+            }
+
+        public string Error;
         }
     }
-}
