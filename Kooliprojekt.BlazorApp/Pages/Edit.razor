@@ -44,7 +44,7 @@
 @code {
     [Parameter] public int Id { get; set; }
 
-    private WorkLog workLog = new WorkLog();
+    private ApiWorkLog workLog = new ApiWorkLog();
     private EditContext editContext;
     private ValidationMessageStore messageStore;
     private string title = "Lisa";
@@ -60,7 +60,7 @@
             {
                 errorMessage = string.Join("; ", getResult.Errors.SelectMany(e => e.Value));
                 // keep a fresh blank model so form still renders
-                workLog = new WorkLog();
+                workLog = new ApiWorkLog();
             }
             else
             {
@@ -102,3 +102,4 @@
         editContext.NotifyValidationStateChanged();
     }
 }
+__

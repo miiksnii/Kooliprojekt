@@ -3,6 +3,10 @@ using Kooliprojekt.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using KooliProjekt.PublicApi.Api;
+using ApiWorkLog = KooliProjekt.PublicApi.Api.ApiWorkLog;
+using DomainWorkLog = Kooliprojekt.Data.WorkLog;
+
 
 namespace KooliProjekt.Controllers
 {
@@ -23,74 +27,113 @@ namespace KooliProjekt.Controllers
 
         // GET: api/WorkLogs
         [HttpGet]
-        public async Task<IEnumerable<WorkLog>> Get()
+        public async Task<ActionResult<Result<List<ApiWorkLog>>>> Get()
         {
-            var result = await _workLogService.List(1, 10000); // Paginate with a large page size (10000) to get all work logs
-            return result.Results;
+            var page = await _workLogService.List(1, 10000);
+            var dtos = page.Results
+                .Select(d => new ApiWorkLog
+                {
+                    Id = d.Id,
+                    Date = d.Date,
+                    TimeSpentInMinutes = d.TimeSpentInMinutes,
+                    WorkerName = d.WorkerName,
+                    Description = d.Description
+                })
+                .ToList();
+            return Ok(new Result<List<ApiWorkLog>> { Value = dtos });
         }
+
 
         // GET api/WorkLogs/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<WorkLog>> Get(int id)
+        public async Task<ActionResult<Result<ApiWorkLog>>> Get(int id)
         {
-            var workLog = await _workLogService.Get(id);
-            if (workLog == null)
-            {
-                return NotFound();
-            }
+            var d = await _workLogService.Get(id);
+            if (d == null)
+                return NotFound(new Result<ApiWorkLog> { Error = $"ID {id} not found." });
 
-            return Ok(workLog);
+            var dto = new ApiWorkLog
+            {
+                Id = d.Id,
+                Date = d.Date,
+                TimeSpentInMinutes = d.TimeSpentInMinutes,
+                WorkerName = d.WorkerName,
+                Description = d.Description
+            };
+            return Ok(new Result<ApiWorkLog> { Value = dto });
         }
 
         // POST api/WorkLogs
         [HttpPost]
-        public async Task<ActionResult<WorkLog>> Post([FromBody] WorkLog workLog)
+        public async Task<ActionResult<Result<ApiWorkLog>>> Post([FromBody] ApiWorkLog dto)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                var errors = ModelState
+                  .Where(x => x.Value.Errors.Any())
+                  .ToDictionary(
+                    x => x.Key.Split('.').Last(),
+                    x => x.Value.Errors.Select(e => e.ErrorMessage).ToList()
+                  );
+                return BadRequest(new Result<ApiWorkLog> { Errors = errors });
             }
 
-            await _workLogService.Save(workLog);
-
-            // Return CreatedAtAction to ensure the location of the newly created resource is known
-            return CreatedAtAction(nameof(Get), new { id = workLog.Id }, workLog);
+            var domain = new DomainWorkLog
+            {
+                Date = dto.Date,
+                TimeSpentInMinutes = dto.TimeSpentInMinutes,
+                WorkerName = dto.WorkerName,
+                Description = dto.Description
+            };
+            await _workLogService.Save(domain);
+            dto.Id = domain.Id;
+            return Ok(new Result<ApiWorkLog> { Value = dto });
         }
 
-        // PUT api/WorkLogs/5
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] WorkLog workLog)
+        public async Task<ActionResult<Result<ApiWorkLog>>> Put(int id, [FromBody] ApiWorkLog dto)
         {
-            if (id != workLog.Id)
+            if (id != dto.Id)
+                return BadRequest(new Result<ApiWorkLog> { Error = "ID mismatch." });
+
+            if (!ModelState.IsValid)
             {
-                return BadRequest("ID in URL and body must match.");
+                var errors = ModelState
+                  .Where(x => x.Value.Errors.Any())
+                  .ToDictionary(
+                    x => x.Key.Split('.').Last(),
+                    x => x.Value.Errors.Select(e => e.ErrorMessage).ToList()
+                  );
+                return BadRequest(new Result<ApiWorkLog> { Errors = errors });
             }
 
-            // Check if the work log exists
-            var existingWorkLog = await _workLogService.Get(id);
-            if (existingWorkLog == null)
+            var exists = await _workLogService.Get(id);
+            if (exists == null)
+                return NotFound(new Result<ApiWorkLog> { Error = $"ID {id} not found." });
+
+            var domain = new DomainWorkLog
             {
-                return NotFound();
-            }
-
-            // If the work log exists, save the updates
-            await _workLogService.Save(workLog);
-
-            return Ok(workLog); // Return the updated work log
+                Id = dto.Id,
+                Date = dto.Date,
+                TimeSpentInMinutes = dto.TimeSpentInMinutes,
+                WorkerName = dto.WorkerName,
+                Description = dto.Description
+            };
+            await _workLogService.Save(domain);
+            return Ok(new Result<ApiWorkLog> { Value = dto });
         }
 
         // DELETE api/WorkLogs/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult<Result>> Delete(int id)
         {
-            var workLog = await _workLogService.Get(id);
-            if (workLog == null)
-            {
-                return NotFound();
-            }
+            var exists = await _workLogService.Get(id);
+            if (exists == null)
+                return NotFound(new Result { Error = $"ID {id} not found." });
 
             await _workLogService.Delete(id);
-            return NoContent(); // No content, but successful deletion
+            return Ok(new Result());
         }
     }
 }

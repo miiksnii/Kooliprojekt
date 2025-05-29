@@ -40,7 +40,7 @@ namespace KooliProjekt.WinFormsApp
 
         private async void SaveButton_Click(object? sender, EventArgs e)
         {
-            var workLog = new WorkLog();
+            var workLog = new ApiWorkLog();
 
             // Parse fields carefully, fallback to defaults if parsing fails
             if (!int.TryParse(IdField.Text, out int id)) id = 0;
@@ -71,7 +71,7 @@ namespace KooliProjekt.WinFormsApp
             if (TodoListsGrid.SelectedRows.Count > 0)
             {
                 var selectedRow = TodoListsGrid.SelectedRows[0];
-                var workLog = selectedRow.DataBoundItem as WorkLog;
+                var workLog = selectedRow.DataBoundItem as ApiWorkLog;
                 if (workLog != null)
                 {
                     IdField.Text = workLog.Id.ToString();

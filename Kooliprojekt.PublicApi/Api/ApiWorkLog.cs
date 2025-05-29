@@ -2,7 +2,7 @@
 
 namespace KooliProjekt.PublicApi.Api
 {
-    public class WorkLog
+    public class ApiWorkLog
     {
         public int Id { get; set; }
 

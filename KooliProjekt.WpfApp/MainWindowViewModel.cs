@@ -7,11 +7,11 @@ namespace KooliProjekt.WpfApp
 {
     public class MainWindowViewModel : NotifyPropertyChangedBase
     {
-        public ObservableCollection<WorkLog> Lists { get; private set; }
+        public ObservableCollection<ApiWorkLog> Lists { get; private set; }
         public ICommand NewCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
         public ICommand DeleteCommand { get; private set; }
-        public Predicate<WorkLog> ConfirmDelete { get; set; }
+        public Predicate<ApiWorkLog> ConfirmDelete { get; set; }
 
         public Action<string> OnError { get; set; }
 
@@ -25,17 +25,17 @@ namespace KooliProjekt.WpfApp
         {
             _apiClient = apiClient;
 
-            Lists = new ObservableCollection<WorkLog>();
+            Lists = new ObservableCollection<ApiWorkLog>();
 
-            NewCommand = new RelayCommand<WorkLog>(
+            NewCommand = new RelayCommand<ApiWorkLog>(
                 // Execute
                 list =>
                 {
-                    SelectedItem = new WorkLog();
+                    SelectedItem = new ApiWorkLog();
                 }
             );
 
-            SaveCommand = new RelayCommand<WorkLog>(
+            SaveCommand = new RelayCommand<ApiWorkLog>(
                 // Execute
                 async list =>
                 {
@@ -49,7 +49,7 @@ namespace KooliProjekt.WpfApp
                 }
             );
 
-            DeleteCommand = new RelayCommand<WorkLog>(
+            DeleteCommand = new RelayCommand<ApiWorkLog>(
                 // Execute
                 async list =>
                 {
@@ -96,8 +96,8 @@ namespace KooliProjekt.WpfApp
             }
         }
 
-        private WorkLog _selectedItem;
-        public WorkLog SelectedItem
+        private ApiWorkLog _selectedItem;
+        public ApiWorkLog SelectedItem
         {
             get
             {

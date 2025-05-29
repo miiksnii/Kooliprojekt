@@ -4,8 +4,8 @@ namespace KooliProjekt.WinFormsApp
 {
     public interface IWorkLogView
     {
-        IList<WorkLog> TodoLists { get; set; }
-        WorkLog SelectedItem { get; set; }
+        IList<ApiWorkLog> TodoLists { get; set; }
+        ApiWorkLog SelectedItem { get; set; }
         string Title { get; set; }
         int Id { get; set; }
         WorkLogPresenter Presenter { get; set; }

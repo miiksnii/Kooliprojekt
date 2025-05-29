@@ -14,13 +14,13 @@ namespace KooliProjekt.PublicApi.Api
 
         }
 
-        public async Task<Result<List<WorkLog>>> List()
+        public async Task<Result<List<ApiWorkLog>>> List()
         {
-            var result = new Result<List<WorkLog>>();
+            var result = new Result<List<ApiWorkLog>>();
 
             try
             {
-                result.Value = await _httpClient.GetFromJsonAsync<List<WorkLog>>("");
+                result.Value = await _httpClient.GetFromJsonAsync<List<ApiWorkLog>>("");
             }
             catch (HttpRequestException ex)
             {
@@ -41,16 +41,16 @@ namespace KooliProjekt.PublicApi.Api
             return result;
         }
 
-        public async Task<Result<WorkLog>> Get(int id)
+        public async Task<Result<ApiWorkLog>> Get(int id)
         {
-            var result = new Result<WorkLog>();
+            var result = new Result<ApiWorkLog>();
 
             try
             {
                 var response = await _httpClient.GetAsync($"{id}"); // ← siit ära "/" + id
                 if (response.IsSuccessStatusCode)
                 {
-                    result.Value = await response.Content.ReadFromJsonAsync<WorkLog>();
+                    result.Value = await response.Content.ReadFromJsonAsync<ApiWorkLog>();
                 }
                 else
                 {
@@ -66,7 +66,7 @@ namespace KooliProjekt.PublicApi.Api
         }
 
 
-        public async Task<Result> Save(WorkLog workLog)
+        public async Task<Result> Save(ApiWorkLog workLog)
         {
             HttpResponseMessage response;
 

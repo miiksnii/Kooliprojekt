@@ -15,8 +15,8 @@ namespace KooliProjekt.WpfApp.UnitTests
         {
             // Arrange
             var mockClient = new Mock<IApiClient>();
-            var sampleData = new List<WorkLog> { new WorkLog { Id = 1, Description = "Test" } };
-            mockClient.Setup(c => c.List()).ReturnsAsync(new Result<List<WorkLog>> { Value = sampleData });
+            var sampleData = new List<ApiWorkLog> { new ApiWorkLog { Id = 1, Description = "Test" } };
+            mockClient.Setup(c => c.List()).ReturnsAsync(new Result<List<ApiWorkLog>> { Value = sampleData });
 
             var viewModel = new MainWindowViewModel(mockClient.Object);
 
@@ -33,7 +33,7 @@ namespace KooliProjekt.WpfApp.UnitTests
         {
             // Arrange
             var mockClient = new Mock<IApiClient>();
-            mockClient.Setup(c => c.List()).ReturnsAsync(new Result<List<WorkLog>> { Error = "Some error" });
+            mockClient.Setup(c => c.List()).ReturnsAsync(new Result<List<ApiWorkLog>> { Error = "Some error" });
 
             var viewModel = new MainWindowViewModel(mockClient.Object);
 
@@ -54,17 +54,18 @@ namespace KooliProjekt.WpfApp.UnitTests
             var mockClient = new Mock<IApiClient>();
             var viewModel = new MainWindowViewModel(mockClient.Object);
 
-            viewModel.SelectedItem = new WorkLog { Id = 1, Description = "Save test" };
+            viewModel.SelectedItem = new ApiWorkLog { Id = 1, Description = "Save test" };
 
-            mockClient.Setup(c => c.Save(It.IsAny<WorkLog>())).Returns(Task.CompletedTask);
-            mockClient.Setup(c => c.List()).ReturnsAsync(new Result<List<WorkLog>> { Value = new List<WorkLog>() });
+            mockClient.Setup(c => c.Save(It.IsAny<ApiWorkLog>()))
+                    .ReturnsAsync(new Result());
+            mockClient.Setup(c => c.List()).ReturnsAsync(new Result<List<ApiWorkLog>> { Value = new List<ApiWorkLog>() });
 
             // Act
             viewModel.SaveCommand.Execute(null);
             await Task.Delay(50); // Allow async code in command to execute
 
             // Assert
-            mockClient.Verify(c => c.Save(It.IsAny<WorkLog>()), Times.Once);
+            mockClient.Verify(c => c.Save(It.IsAny<ApiWorkLog>()), Times.Once);
             mockClient.Verify(c => c.List(), Times.Once);
         }
 
@@ -74,7 +75,7 @@ namespace KooliProjekt.WpfApp.UnitTests
             // Arrange
             var mockClient = new Mock<IApiClient>();
             var viewModel = new MainWindowViewModel(mockClient.Object);
-            var workLog = new WorkLog { Id = 123 };
+            var workLog = new ApiWorkLog { Id = 123 };
             viewModel.SelectedItem = workLog;
             viewModel.Lists.Add(workLog);
 
@@ -95,7 +96,7 @@ namespace KooliProjekt.WpfApp.UnitTests
             // Arrange
             var mockClient = new Mock<IApiClient>();
             var viewModel = new MainWindowViewModel(mockClient.Object);
-            var workLog = new WorkLog { Id = 123 };
+            var workLog = new ApiWorkLog { Id = 123 };
             viewModel.SelectedItem = workLog;
             viewModel.Lists.Add(workLog);
 
