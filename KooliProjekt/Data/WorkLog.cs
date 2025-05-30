@@ -1,7 +1,6 @@
 ﻿using KooliProjekt.Data;
 using System.ComponentModel.DataAnnotations;
 
-
 namespace Kooliprojekt.Data
 {
     public class WorkLog
@@ -14,12 +13,10 @@ namespace Kooliprojekt.Data
         [Range(1, 1440)]
         public int TimeSpentInMinutes { get; set; }
 
-        [Required]
         [StringLength(100)]
-        public string WorkerName { get; set; }
+        public string? WorkerName { get; set; }  // <-- changed here to nullable
 
         [StringLength(500)]
         public string? Description { get; set; }
     }
-
 }
