@@ -56,7 +56,7 @@ namespace Kooliprojekt.Controllers
 
         // POST: ProjectLists/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title")] ProjectList projectList)
         {
             if (ModelState.IsValid)
@@ -84,7 +84,7 @@ namespace Kooliprojekt.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ProjectList list)
         {
             if (id != list.Id)
@@ -118,7 +118,7 @@ namespace Kooliprojekt.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _projectListService.DeleteWithDependenciesAsync(id);
