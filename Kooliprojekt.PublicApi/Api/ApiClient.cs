@@ -20,7 +20,17 @@ namespace KooliProjekt.PublicApi.Api
 
             try
             {
-                result.Value = await _httpClient.GetFromJsonAsync<List<ApiWorkLog>>("");
+                var apiResult = await _httpClient.GetFromJsonAsync<Result<List<ApiWorkLog>>>("");
+
+                if (apiResult != null)
+                {
+                    result = apiResult;
+                }
+                else
+                {
+                    result.Error = "Tühine vastus serverilt.";
+                }
+
             }
             catch (HttpRequestException ex)
             {
