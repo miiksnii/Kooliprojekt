@@ -1,8 +1,9 @@
-﻿using System.IO;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace KooliProjekt.IntegrationTests.Helpers
 {
@@ -13,20 +14,15 @@ namespace KooliProjekt.IntegrationTests.Helpers
             var host = Host.CreateDefaultBuilder()
                             .ConfigureWebHost(builder =>
                             {
-                                builder.UseContentRoot(".");
-                                builder.ConfigureAppConfiguration((c, b) =>
+                                builder.UseContentRoot(Directory.GetCurrentDirectory());
+                                builder.ConfigureAppConfiguration((context, config) =>
                                 {
-                                    c.HostingEnvironment.ApplicationName = "KooliProjekt";
+                                    config.AddJsonFile("appsettings.json"); // Ensure configuration is loaded
                                 });
-                                builder.UseStartup<TTestStartup>();
-                            })
-                            .ConfigureAppConfiguration((context, conf) =>
-                            {
-                                var projectDir = Directory.GetCurrentDirectory();
-                                var configPath = Path.Combine(projectDir, "appsettings.json");
 
-                                conf.AddJsonFile(configPath);                                   
+                                builder.UseStartup<TTestStartup>(); // Use the actual startup class or test one
                             });
+
             return host;
         }
     }

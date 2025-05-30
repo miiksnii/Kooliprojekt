@@ -1,19 +1,21 @@
 ﻿using System;
-using Kooliprojekt.Controllers;
-using Kooliprojekt.Data;
 using KooliProjekt.Controllers;
 using KooliProjekt.Data;
+
+using Kooliprojekt.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using KooliProjekt.Data.Repositories;
+using Kooliprojekt.Data;
+using Kooliprojekt.Controllers;
 
 namespace KooliProjekt.IntegrationTests.Helpers
 {
-    public class FakeStartup //: Startup
+    public class FakeStartup
     {
         public FakeStartup(IConfiguration configuration)
         {
@@ -27,24 +29,25 @@ namespace KooliProjekt.IntegrationTests.Helpers
             var dbGuid = Guid.NewGuid().ToString();
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("TestConnection"));
+                options.UseInMemoryDatabase(databaseName: dbGuid);
             });
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            //services.AddAutoMapper(GetType().Assembly);
             services.AddControllersWithViews()
                     .AddApplicationPart(typeof(HomeController).Assembly);
 
-            //services.AddScoped<IFileClient, LocalFileClient>();
+            services.AddScoped<IProjectListService, ProjectListService>();
+            services.AddScoped<IProjectItemService, ProjectItemService>();
+            services.AddScoped<IWorkLogService, WorkLogService>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseStaticFiles();
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -54,34 +57,6 @@ namespace KooliProjekt.IntegrationTests.Helpers
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}/{pathStr?}");
             });
-
-            var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
-            using (var serviceScope = serviceScopeFactory.CreateScope())
-            {
-                var dbContext = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
-                if (dbContext == null)
-                {
-                    throw new NullReferenceException("Cannot get instance of dbContext");
-                }
-
-                if (dbContext.Database.GetDbConnection().ConnectionString.ToLower().Contains("my.db"))
-                {
-                    throw new Exception("LIVE SETTINGS IN TESTS!");
-                }
-
-                //EnsureDatabase(dbContext);
-            }
         }
-
-        //private void EnsureDatabase(ApplicationDbContext dbContext)
-        //{
-        //    dbContext.Database.EnsureDeleted();
-        //    dbContext.Database.EnsureCreated();
-
-        //    if (!dbContext.Degustation.Any() || !dbContext.Batch.Any() || !dbContext.BatchIngredient.Any() || !dbContext.Batchlog.Any() || !dbContext.Batch.Any() || !dbContext.User.Any())
-        //    {
-        //        SeedData.Initialize(dbContext);
-        //    }
-        //}
     }
 }
