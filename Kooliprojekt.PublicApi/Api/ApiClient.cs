@@ -16,30 +16,38 @@ namespace KooliProjekt.PublicApi.Api
 
         public async Task<Result<List<ApiWorkLog>>> List()
         {
-            var result = new Result<List<ApiWorkLog>>();
-
+            // Proovime API-st saada otse Result<List<ApiWorkLog>> objekti
             try
             {
-                result.Value = await _httpClient.GetFromJsonAsync<List<ApiWorkLog>>("");
+                // Deserialiseerime JSON-i Result<T> struktuuri
+                var apiResult = await _httpClient.GetFromJsonAsync<Result<List<ApiWorkLog>>>("");
+
+                // Kui JSON-i lugemine ebaõnnestus või tagastati null
+                if (apiResult == null)
+                {
+                    return new Result<List<ApiWorkLog>>
+                    {
+                        Error = "Serveri vastust ei õnnestu töödelda."
+                    };
+                }
+
+                return apiResult;
             }
             catch (HttpRequestException ex)
             {
+                var result = new Result<List<ApiWorkLog>>();
                 if (ex.HttpRequestError == HttpRequestError.ConnectionError)
-                {
                     result.Error = "Ei saa serveriga ühendust. Palun proovi hiljem uuesti.";
-                }
                 else
-                {
                     result.Error = ex.Message;
-                }
+                return result;
             }
             catch (Exception ex)
             {
-                result.Error = ex.Message;
+                return new Result<List<ApiWorkLog>> { Error = ex.Message };
             }
-
-            return result;
         }
+
 
         public async Task<Result<ApiWorkLog>> Get(int id)
         {
@@ -72,20 +80,25 @@ namespace KooliProjekt.PublicApi.Api
 
             if (workLog.Id == 0)
             {
+                // Create (POST /api/worklogs/)
                 response = await _httpClient.PostAsJsonAsync("", workLog);
             }
             else
             {
+                // Update (PUT /api/worklogs/{id})
                 response = await _httpClient.PutAsJsonAsync(workLog.Id.ToString(), workLog);
             }
 
             if (!response.IsSuccessStatusCode)
             {
+                // Parsime viga-body’st Result-objekti
                 return await response.Content.ReadFromJsonAsync<Result>();
             }
 
+            // Edu korral tagastame tühja Result-i (.Error == null)
             return new Result();
         }
+
 
 
 
