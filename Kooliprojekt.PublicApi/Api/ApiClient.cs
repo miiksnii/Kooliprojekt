@@ -100,8 +100,6 @@ namespace KooliProjekt.PublicApi.Api
         }
 
 
-
-
         public async Task Delete(int id)
         {
             await _httpClient.DeleteAsync(id.ToString()); 

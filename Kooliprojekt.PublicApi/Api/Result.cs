@@ -16,7 +16,7 @@
                     return Errors.Count > 0;
                 }
             }
-
+            
             public void AddError(string propertyName, string errorMessage)
             {
                 if (!Errors.ContainsKey(propertyName))

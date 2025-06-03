@@ -19,5 +19,4 @@ namespace KooliProjekt.PublicApi.Api
         [StringLength(500)]
         public string? Description { get; set; }
     }
-
 }

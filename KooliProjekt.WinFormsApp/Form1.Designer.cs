@@ -134,8 +134,7 @@
             TimeSpentField.Location = new Point(557, 177);
             TimeSpentField.Name = "TimeSpentField";
             TimeSpentField.Size = new Size(231, 23);
-            TimeSpentField.TabIndex = 11;
-            TimeSpentField.TextChanged += TimeSpentField_TextChanged;
+            TimeSpentField.TabIndex = 11;            
             // 
             // WorkerNameLabel
             // 

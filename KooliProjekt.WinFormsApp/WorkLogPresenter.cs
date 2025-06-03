@@ -14,126 +14,42 @@ namespace KooliProjekt.WinFormsApp
     public class WorkLogPresenter
     {
         private readonly IApiClient _apiClient;
-        private readonly IWorkLogView _view;
+        private readonly IWorkLogView _todoView;
 
-        public WorkLogPresenter(IWorkLogView view, IApiClient apiClient)
+        public WorkLogPresenter(IWorkLogView todoView, IApiClient apiClient)
         {
             _apiClient = apiClient;
-            _view = view;
-            _view.Presenter = this;
+            _todoView = todoView;
+
+            todoView.Presenter = this;
         }
 
-        public async Task LoadAsync()
+        public void UpdateView(ApiWorkLog workLog) // Parandatud tüüp: ApiWorkLog
         {
-            try
+            if (workLog == null)
             {
-                var result = await _apiClient.List();
-                if (!string.IsNullOrEmpty(result.Error))
-                {
-                    _view.ShowMessage($"Andmete laadimine ebaõnnestus: {result.Error}", "Viga", MessageBoxIcon.Error);
-                    return;
-                }
-
-                _view.WorkLogs = result.Value;
-                _view.ClearSelection();
+                // Kui workLog on null, puhasta kõik vaate väljad ja sea vaikimisi väärtused uueks kirjeks
+                _todoView.Id = "0"; // Vaikimisi ID uue kirje jaoks
+                _todoView.Date = DateTime.Now.ToString("yyyy-MM-dd"); // Vaikimisi tänane kuupäev
+                _todoView.TimeSpent = "1"; // Vaikimisi 1 minut
+                _todoView.WorkerName = string.Empty;
+                _todoView.Description = string.Empty;                
             }
-            catch (Exception ex)
+            else
             {
-                _view.ShowMessage($"Andmete laadimisel tekkis ootamatu viga: {ex.Message}", "Viga", MessageBoxIcon.Error);
-            }
-        }
-
-        public void New()
-        {
-            _view.ClearSelection();
-            _view.Id = "0";
-            _view.Date = DateTime.Now.ToString("yyyy-MM-dd");
-            _view.TimeSpent = "1";
-            _view.WorkerName = "Unknown";
-            _view.Description = string.Empty;
-        }
-
-        public async Task SaveAsync()
-        {
-            if (!int.TryParse(_view.Id, out var id))
-            {
-                _view.ShowMessage("ID väli peab olema täisarv või tühi.", "Viga", MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(_view.Date) ||
-                !DateTime.TryParseExact(_view.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
-            {
-                _view.ShowMessage("Kuupäev on kohustuslik ja peab olema formaadis yyyy-MM-dd.", "Viga", MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(_view.TimeSpent) ||
-                !int.TryParse(_view.TimeSpent, out var tsParsed) ||
-                tsParsed < 1 || tsParsed > 1440)
-            {
-                _view.ShowMessage("Aja kulu minutites on kohustuslik (1–1440).", "Viga", MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(_view.WorkerName))
-            {
-                _view.ShowMessage("Töötaja nimi on kohustuslik.", "Viga", MessageBoxIcon.Warning);
-                return;
-            }
-
-            var workLog = new ApiWorkLog
-            {
-                Id = id,
-                Date = dt,
-                TimeSpentInMinutes = tsParsed,
-                WorkerName = _view.WorkerName,
-                Description = string.IsNullOrWhiteSpace(_view.Description) ? null : _view.Description
-            };
-
-            try
-            {
-                var saveResult = await _apiClient.Save(workLog);
-                if (!string.IsNullOrEmpty(saveResult.Error))
-                {
-                    _view.ShowMessage($"Salvestamine ebaõnnestus: {saveResult.Error}", "Viga", MessageBoxIcon.Error);
-                }
-                else
-                {
-                    _view.ShowMessage(id <= 0 ? "Uus kirje on loodud." : "Kirje on uuendatud.",
-                                      "Info", MessageBoxIcon.Information);
-                    await LoadAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                _view.ShowMessage($"Salvestamisel tekkis ootamatu viga: {ex.Message}", "Viga", MessageBoxIcon.Error);
+                // Kui workLog ei ole null, täida vaate väljad objekti andmetega
+                _todoView.Id = workLog.Id.ToString();
+                _todoView.Date = workLog.Date?.ToString("yyyy-MM-dd");
+                _todoView.TimeSpent = workLog.TimeSpentInMinutes?.ToString() ?? string.Empty; // Kasutame null-coalescing operaatorit
+                _todoView.WorkerName = workLog.WorkerName ?? string.Empty; // Kasutame null-coalescing operaatorit
+                _todoView.Description = workLog.Description ?? string.Empty; // Kasutame null-coalescing operaatorit
             }
         }
 
-        public async Task DeleteAsync()
+        public async Task Load()
         {
-            var selected = _view.SelectedItem;
-            if (selected == null || selected.Id <= 0)
-            {
-                _view.ShowMessage("Palun vali rida, mida soovid kustutada.", "Hoiatus", MessageBoxIcon.Warning);
-                return;
-            }
-
-            var dlg = MessageBox.Show($"Kas oled kindel, et soovid kustutada töölogi ID={selected.Id}?",
-                                      "Kustuta kinnitamine", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (dlg != DialogResult.Yes) return;
-
-            try
-            {
-                await _apiClient.Delete(selected.Id);
-                _view.ShowMessage("Kirje edukalt kustutatud.", "Info", MessageBoxIcon.Information);
-                await LoadAsync();
-            }
-            catch (Exception ex)
-            {
-                _view.ShowMessage($"Kustutamisel tekkis viga: {ex.Message}", "Viga", MessageBoxIcon.Error);
-            }
+            var todoLists = await _apiClient.List();
+            _todoView.WorkLogs = todoLists.Value;
         }
     }
 }

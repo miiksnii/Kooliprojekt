@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using KooliProjekt.PublicApi.Api;
@@ -10,337 +10,201 @@ namespace KooliProjekt.WinFormsApp
 {
     public partial class Form1 : Form, IWorkLogView
     {
+        public WorkLogPresenter Presenter { get; set; }
+
         public Form1()
         {
-            get => (IList<ApiWorkLog>)TodoListsGrid.DataSource;
-            set => TodoListsGrid.DataSource = value;
-        }
+            InitializeComponent();
 
-            // meetodid
-            TodoListsGrid.SelectionChanged += TodoListsGrid_SelectionChanged;
-            NewButton.Click += NewButton_Click;
-            SaveButton.Click += SaveButton_Click;
-            DeleteButton.Click += DeleteButton_Click;
-            TimeSpentField.TextChanged += TimeSpentField_TextChanged;
-            
+            TodoListsGrid.SelectionChanged += (s, e) => OnSelectionChanged();
+            NewButton.Click += (s, e) => Presenter.UpdateView(null);
+            SaveButton.Click += async (s, e) => await SaveCurrentAsync();
+            DeleteButton.Click += async (s, e) => await DeleteCurrentAsync();
+
+            TimeSpentField.TextChanged += (s, e) =>
+            {
+                if (!string.IsNullOrEmpty(TimeSpentField.Text) && !int.TryParse(TimeSpentField.Text, out _))
+                    TimeSpentField.BackColor = Color.LightPink;
+                else
+                    TimeSpentField.BackColor = Color.White;
+            };
         }
 
         protected override async void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            await LoadDataAsync();
+            // Presenter is set in Program.cs before Application.Run(form)
+            await Presenter.Load();
         }
 
-        /// <summary>
-        ///  Andmete laadimine: kutsub ApiClient.List(),
-        ///  kuvab vea või seob DataGridView’ga.
-        /// </summary>
-        private async Task LoadDataAsync()
-        {
-            try
-            {
-                var apiClient = new ApiClient();
-                var result = await apiClient.List();
+        // IWorkLogView implementation
 
-                if (!string.IsNullOrEmpty(result.Error))
+        public IList<ApiWorkLog> WorkLogs
+        {
+            get => (IList<ApiWorkLog>)TodoListsGrid.DataSource;
+            set
+            {
+                TodoListsGrid.AutoGenerateColumns = true;
+                TodoListsGrid.DataSource = value;
+                ClearSelection();
+            }
+        }
+
+        public ApiWorkLog SelectedItem
+        {
+            get
+            {
+                if (TodoListsGrid.SelectedRows.Count == 0) return null;
+                return (ApiWorkLog)TodoListsGrid.SelectedRows[0].DataBoundItem;
+            }
+            set
+            {
+                if (value == null)
                 {
-                    MessageBox.Show(
-                        $"Andmete laadimine ebaõnnestus: {result.Error}",
-                        "Viga",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error
-                    );
+                    ClearFields();
                     return;
                 }
 
-                TodoListsGrid.AutoGenerateColumns = true;
-                TodoListsGrid.DataSource = result.Value;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"Andmete laadimisel tekkis ootamatu viga: {ex.Message}",
-                    "Viga",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
+                Id = value.Id.ToString();
+                Date = value.Date?.ToString("yyyy-MM-dd") ?? string.Empty;
+                TimeSpent = value.TimeSpentInMinutes?.ToString() ?? string.Empty;
+                WorkerName = value.WorkerName;
+                Description = value.Description;
             }
         }
 
-        private void NewButton_Click(object? sender, EventArgs e)
+        public string Id
+        {
+            get => IdField.Text;
+            set => IdField.Text = value;
+        }
+
+        public string Date
+        {
+            get => DateField.Text;
+            set => DateField.Text = value;
+        }
+
+        public string TimeSpent
+        {
+            get => TimeSpentField.Text;
+            set => TimeSpentField.Text = value;
+        }
+
+        public string WorkerName
+        {
+            get => WorkerNameField.Text;
+            set => WorkerNameField.Text = value;
+        }
+
+        public string Description
+        {
+            get => DescriptionField.Text;
+            set => DescriptionField.Text = value;
+        }
+
+        public void ShowMessage(string text, string caption, MessageBoxIcon icon)
+        {
+            MessageBox.Show(text, caption, MessageBoxButtons.OK, icon);
+        }
+
+        public void ClearSelection()
         {
             TodoListsGrid.ClearSelection();
-
-            IdField.Text = "0";
-            DateField.Text = DateTime.Now.ToString("yyyy-MM-dd");
-            TimeSpentField.Text = "1";
-            WorkerNameField.Text = "Unknown";
-            DescriptionField.Text = string.Empty;
-
-            DateField.Focus();
         }
 
-
-        /// <summary>
-        ///  “Save” nupp:
-        ///  - kui IdField tühi või 0 → POST
-        ///  - muidu PUT
-        ///  Pärast salvestust: uuesti LoadDataAsync().
-        /// </summary>
-        private async void SaveButton_Click(object? sender, EventArgs e)
+        public void ClearFields()
         {
-            // 1) ID-parsimine
-            int id = 0;
-            if (!string.IsNullOrWhiteSpace(IdField.Text))
-            {   
+            IdField.Text = string.Empty;
+            DateField.Text = string.Empty;
+            TimeSpentField.Text = string.Empty;
+            WorkerNameField.Text = string.Empty;
+            DescriptionField.Text = string.Empty;
+        }
 
-                if (!int.TryParse(IdField.Text, out id))
-                {
-                    MessageBox.Show(
-                        "ID väli peab olema täisarv või tühi.",
-                        "Viga",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning
-                    );
-                    return;
-                }
-            }
+        private void OnSelectionChanged()
+        {
+            var item = SelectedItem;
+            Presenter.UpdateView(item);
+        }
 
-            // 2) Kuupäeva parsimine (yyyy-MM-dd)
-            DateTime? dateValue = null;
-            if (!string.IsNullOrWhiteSpace(DateField.Text))
+        private async Task SaveCurrentAsync()
+        {
+            // Kogume vaate väljade väärtused uue ApiWorkLog-objekti sisse
+            if (!int.TryParse(Id, out var id)) id = 0;
+
+            if (!DateTime.TryParseExact(Date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
             {
-                if (DateTime.TryParseExact(
-                        DateField.Text,
-                        "yyyy-MM-dd",
-                        CultureInfo.InvariantCulture,
-                        DateTimeStyles.None,
-                        out var dt
-                    ))
-                {
-                    dateValue = dt;
-                }
-                else
-                {
-                    MessageBox.Show(
-                        "Kuupäeva formaat peab olema yyyy-MM-dd.",
-                        "Viga",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning
-                    );
-                    return;
-                }
+                ShowMessage("Kuupäev on kohustuslik ja peab olema formaadis yyyy-MM-dd.", "Viga", MessageBoxIcon.Warning);
+                return;
             }
 
-            // 3) TimeSpentInMinutes (int?)
-            int? timeSpent = null;
-            if (!string.IsNullOrWhiteSpace(TimeSpentField.Text))
+            if (!int.TryParse(TimeSpent, out var ts) || ts < 1 || ts > 1440)
             {
-                if (int.TryParse(TimeSpentField.Text, out var tsParsed))
-                {
-                    timeSpent = tsParsed;
-                }
-                else
-                {
-                    MessageBox.Show(
-                        "Aja kulu minutites peab olema täisarv.",
-                        "Viga",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning
-                    );
-                    return;
-                }
+                ShowMessage("Aja kulu minutites on kohustuslik (1–1440).", "Viga", MessageBoxIcon.Warning);
+                return;
             }
 
-            // 4) WorkerName ja Description (nullable)
-            var workerName = WorkerNameField.Text;
-            var description = DescriptionField.Text;
+            if (string.IsNullOrWhiteSpace(WorkerName))
+            {
+                ShowMessage("Töötaja nimi on kohustuslik.", "Viga", MessageBoxIcon.Warning);
+                return;
+            }
 
-            // 5) Koosta ApiWorkLog
             var workLog = new ApiWorkLog
             {
                 Id = id,
-                Date = dateValue,
-                TimeSpentInMinutes = timeSpent,
-                WorkerName = string.IsNullOrWhiteSpace(workerName) ? null : workerName,
-                Description = string.IsNullOrWhiteSpace(description) ? null : description
+                Date = dt,
+                TimeSpentInMinutes = ts,
+                WorkerName = WorkerName,
+                Description = string.IsNullOrWhiteSpace(Description) ? null : Description
             };
 
-            // 6) Salvesta API kaudu
             try
             {
-                var apiClient = new ApiClient();
-                var saveResult = await apiClient.Save(workLog);
-
-                if (!string.IsNullOrEmpty(saveResult.Error))
+                var result = await new ApiClient().Save(workLog);
+                if (!string.IsNullOrEmpty(result.Error))
                 {
-                    // Server tagastas vea
-                    MessageBox.Show(
-                        $"Salvestamine ebaõnnestus: {saveResult.Error}",
-                        "Viga",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error
-                    );
+                    ShowMessage($"Salvestamine ebaõnnestus: {result.Error}", "Viga", MessageBoxIcon.Error);
+                    return;
                 }
-                else
-                {
-                    // Edukas salvestus
-                    if (id <= 0)
-                        MessageBox.Show(
-                            "Uus kirje on loodud.",
-                            "Info",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information
-                        );
-                    else
-                        MessageBox.Show(
-                            "Kirje on uuendatud.",
-                            "Info",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information
-                        );
 
-                    // 7) Uuesti andmed gridi
-                    await LoadDataAsync();
-                }
+                ShowMessage(id <= 0 ? "Uus kirje on loodud." : "Kirje on uuendatud.", "Info", MessageBoxIcon.Information);
+                await Presenter.Load();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    $"Salvestamisel tekkis ootamatu viga: {ex.Message}",
-                    "Viga",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
+                ShowMessage($"Salvestamisel tekkis ootamatu viga: {ex.Message}", "Viga", MessageBoxIcon.Error);
             }
         }
 
-        /// <summary>
-        ///  “Delete” nupp:
-        ///  - kontrollid, et rida on valitud ja Id > 0
-        ///  - küsi kinnitust
-        ///  - kutsu apiClient.Delete(id)
-        ///  - uuenda gridi
-        /// </summary>
-        private async void DeleteButton_Click(object? sender, EventArgs e)
+        private async Task DeleteCurrentAsync()
         {
-            // 1) Kontroll, kas rida valitud
-            if (TodoListsGrid.SelectedRows.Count == 0)
+            var item = SelectedItem;
+            if (item == null || item.Id <= 0)
             {
-                MessageBox.Show(
-                    "Palun vali rida, mida soovid kustutada.",
-                    "Hoiatus",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
-                );
+                ShowMessage("Palun vali rida, mida soovid kustutada.", "Hoiatus", MessageBoxIcon.Warning);
                 return;
             }
 
-            // 2) Võta ApiWorkLog
-            var selected = (ApiWorkLog)TodoListsGrid.SelectedRows[0].DataBoundItem;
-            if (selected == null || selected.Id <= 0)
-            {
-                MessageBox.Show(
-                    "Valitud objekt ei sisalda kehtivat Id-d.",
-                    "Viga",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-                return;
-            }
-
-            // 3) Kinnita
             var dlg = MessageBox.Show(
-                $"Kas oled kindel, et soovid kustutada töölogi ID={selected.Id}?",
+                $"Kas oled kindel, et soovid kustutada töölogi ID={item.Id}?",
                 "Kustuta kinnitamine",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question
             );
+            if (dlg != DialogResult.Yes) return;
 
-            if (dlg != DialogResult.Yes)
-                return;
-
-            // 4) Kustuta API kaudu ja uuenda gridi
             try
             {
-                var apiClient = new ApiClient();
-                await apiClient.Delete(selected.Id);
-
-                MessageBox.Show(
-                    "Kirje edukalt kustutatud.",
-                    "Info",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information
-                );
-
-                await LoadDataAsync();
+                await new ApiClient().Delete(item.Id);
+                ShowMessage("Kirje edukalt kustutatud.", "Info", MessageBoxIcon.Information);
+                await Presenter.Load();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    $"Kustutamisel tekkis viga: {ex.Message}",
-                    "Viga",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
+                ShowMessage($"Kustutamisel tekkis viga: {ex.Message}", "Viga", MessageBoxIcon.Error);
             }
-        }
-
-        /// <summary>
-        ///  Kui kasutaja valib rea gridi’s, täida tekstiväljad vastavalt valitud ApiWorkLog objektile.
-        /// </summary>
-        private void TodoListsGrid_SelectionChanged(object? sender, EventArgs e)
-        {
-            if (TodoListsGrid.SelectedRows.Count == 0)
-            {
-                IdField.Text = string.Empty;
-                DateField.Text = string.Empty;
-                TimeSpentField.Text = string.Empty;
-                WorkerNameField.Text = string.Empty;
-                DescriptionField.Text = string.Empty;
-                return;
-            }
-
-            var todoList = (ApiWorkLog)TodoListsGrid.SelectedRows[0].DataBoundItem;
-            if (todoList == null)
-            {
-                IdField.Text = string.Empty;
-                DateField.Text = string.Empty;
-                TimeSpentField.Text = string.Empty;
-                WorkerNameField.Text = string.Empty;
-                DescriptionField.Text = string.Empty;
-            }
-            else
-            {
-                // Id
-                IdField.Text = todoList.Id.ToString();
-
-                // Kuupäev
-                if (todoList.Date.HasValue)
-                    DateField.Text = todoList.Date.Value.ToString("yyyy-MM-dd");
-                else
-                    DateField.Text = string.Empty;
-
-                // Kulutatud aeg
-                TimeSpentField.Text = todoList.TimeSpentInMinutes.HasValue
-                    ? todoList.TimeSpentInMinutes.Value.ToString()
-                    : string.Empty;
-
-                // Nimi ja kirjeldus
-                WorkerNameField.Text = todoList.WorkerName ?? string.Empty;
-                DescriptionField.Text = todoList.Description ?? string.Empty;
-            }
-        }
-
-        /// <summary>
-        ///  Live-valiide: kui TimeSpentField-s pole täisarv, muuda taust punaseks, vastasel juhul valgeks.
-        /// </summary>
-        private void TimeSpentField_TextChanged(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(TimeSpentField.Text) && !int.TryParse(TimeSpentField.Text, out _))
-                TimeSpentField.BackColor = Color.LightPink;
-            else
-                TimeSpentField.BackColor = Color.White;
         }
     }
 }

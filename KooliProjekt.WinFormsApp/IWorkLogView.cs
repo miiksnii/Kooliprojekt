@@ -1,3 +1,4 @@
+
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +10,13 @@ using KooliProjekt.PublicApi.Api;
 using System;
 using System.Collections.Generic;
 
+
 namespace KooliProjekt.WinFormsApp
 {
     public interface IWorkLogView
     {
         IList<ApiWorkLog> WorkLogs { get; set; }
         ApiWorkLog SelectedItem { get; set; }
-
         string Id { get; set; }
         string Date { get; set; }
         string TimeSpent { get; set; }
@@ -23,9 +24,5 @@ namespace KooliProjekt.WinFormsApp
         string Description { get; set; }
 
         WorkLogPresenter Presenter { get; set; }
-
-        void ShowMessage(string text, string caption, MessageBoxIcon icon);
-        void ClearSelection();
-        void ClearFields();
     }
 }
