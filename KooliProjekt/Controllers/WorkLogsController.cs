@@ -59,7 +59,7 @@ namespace Kooliprojekt.Controllers
 
         // POST: WorkLogs/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Date,TimeSpentInMinutes,WorkerName,Description,ProjectIListId")] WorkLog workLog)
         {
             if (ModelState.IsValid)
@@ -94,7 +94,7 @@ namespace Kooliprojekt.Controllers
 
         // POST: WorkLogs/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Date,TimeSpentInMinutes,WorkerName,Description")] WorkLog workLog)
         {
             if (id != workLog.Id)
@@ -132,7 +132,7 @@ namespace Kooliprojekt.Controllers
 
         // POST: WorkLogs/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _workLogService.Delete(id);

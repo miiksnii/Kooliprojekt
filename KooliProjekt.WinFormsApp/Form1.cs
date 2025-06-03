@@ -12,7 +12,9 @@ namespace KooliProjekt.WinFormsApp
     {
         public Form1()
         {
-            InitializeComponent();
+            get => (IList<ApiWorkLog>)TodoListsGrid.DataSource;
+            set => TodoListsGrid.DataSource = value;
+        }
 
             // meetodid
             TodoListsGrid.SelectionChanged += TodoListsGrid_SelectionChanged;

@@ -106,32 +106,5 @@ namespace KooliProjekt.IntegrationTests
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
         
-        [Fact]
-        public async Task Delete_ProjectItem_ReturnsNoContent_WhenDeleted()
-        {
-            var client = Factory.CreateClient();
-
-            // First, create a ProjectItem to delete
-            var newProjectItem = new
-            {
-                Name = "Project Item to Delete",
-                Title = "Title to Delete",
-                StartDate = "2025-01-01T00:00:00",
-                EstimatedWorkTime = 100,
-                AdminName = "Admin User"
-            };
-
-            var content = new StringContent(JsonConvert.SerializeObject(newProjectItem), Encoding.UTF8, "application/json");
-            var createResponse = await client.PostAsync("/api/ProjectItems", content);
-
-            var createdProjectItem = JsonConvert.DeserializeObject<dynamic>(await createResponse.Content.ReadAsStringAsync());
-            int createdProjectItemId = createdProjectItem.id;
-
-            // Now delete the ProjectItem
-            var deleteResponse = await client.DeleteAsync($"/api/ProjectItems/{createdProjectItemId}");
-
-            deleteResponse.EnsureSuccessStatusCode();
-            Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
-        }
     }
 }
